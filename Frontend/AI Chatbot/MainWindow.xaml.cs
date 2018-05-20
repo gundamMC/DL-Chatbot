@@ -24,5 +24,10 @@ namespace AI_Chatbot
         {
             InitializeComponent();
         }
+
+        private void Title_Bar_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
+        }
     }
 }

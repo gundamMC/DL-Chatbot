@@ -1,0 +1,61 @@
+﻿<UserControl x:Name="ChatBubble" x:Class="AI_Chatbot.ChatBubbleControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AI_Chatbot"
+             mc:Ignorable="d" 
+             d:DesignWidth="400" MaxWidth="400">
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Setters>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <!-- User chat bubble on the right -->
+            </Style.Setters>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsUser, ElementName=ChatBubble}" Value="False">
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                    <!-- Bot chat bubble on the left -->
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
+    <Grid>
+        <Rectangle RadiusX="15" RadiusY="15">
+            <Rectangle.Style>
+                <Style TargetType="Rectangle">
+                    <Style.Setters>
+                        <Setter Property="Fill" Value="#559bb6"/>
+                        <!-- User chat bubble background color -->
+                    </Style.Setters>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=IsUser, ElementName=ChatBubble}" Value="False">
+                            <Setter Property="Fill" Value="#d1e2e8"/>
+                            <!-- Bot chat bubble background color -->
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Rectangle.Style>
+        </Rectangle>
+
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Path=Text, ElementName=ChatBubble}" VerticalAlignment="Top" MaxWidth="400" Margin="15" FontSize="20" FontFamily="Microsoft YaHei">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Setters>
+                        <Setter Property="Foreground" Value="#eaf7fc"/>
+                        <!-- User chat bubble text color -->
+                    </Style.Setters>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=IsUser, ElementName=ChatBubble}" Value="False">
+                            <Setter Property="Foreground" Value="#42575e"/>
+                            <!-- Bot chat bubble text color -->
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        
+        </TextBlock>
+
+    </Grid>
+</UserControl>

@@ -23,7 +23,8 @@ def load_cornell(path_conversations, path_lines):
 
         movie_lines[movie][line_number] = (character, sentence)
 
-    conversations = []
+    questions = []
+    responses = []
     conversations_file = open(path_conversations, 'r', encoding="iso-8859-1")
     for line in conversations_file:
         line = line.split(" +++$+++ ")
@@ -65,23 +66,26 @@ def load_cornell(path_conversations, path_lines):
         # conversations.append(lines)
 
         for i in range(len(line_numbers) - 1):
-            input_line = movie_lines[movie][line_numbers[i]][1]
-            output_line = movie_lines[movie][line_numbers[i + 1]][1]
-            conversations.append([cornell_cleanup(input_line), cornell_cleanup(output_line)])
+            questions.append(cornell_cleanup(movie_lines[movie][line_numbers[i]][1]))
+            responses.append(cornell_cleanup(movie_lines[movie][line_numbers[i + 1]][1]))
 
-    return conversations
+    return questions, responses
 
 
 def split_sentence(sentence):
     # collect independent words
-    return re.findall(r"[\w']+|[.,!?;]", sentence)
+    result = re.findall(r"[\w']+|[.,!?;]", sentence)
+    return result, len(result)
 
 
 def split_data(data):
     result = []
-    for conversation in data:
-        result.append([split_sentence(conversation[0]), split_sentence(conversation[1])])
-    return result
+    length = []
+    for line in data:
+        tmp, tmp_length = split_sentence(line)
+        result.append(tmp)
+        length.append(tmp_length)
+    return result, length
 
 
 def sentence_to_index(sentence, word_to_index):
@@ -95,16 +99,14 @@ def sentence_to_index(sentence, word_to_index):
     if len(result) < 49:  # last one will always be eos
         result.extend([word_to_index["<PAD>"]] * (49 - len(result)))
         result.append(word_to_index["<EOS>"])
-        return result
     else:
         result = result[:50]
         result.append(word_to_index["<EOS>"])
-        return result
+    return result
 
 
 def data_to_index(data, word_to_index):
     result = []
-    for conversation in data:
-        result.append([sentence_to_index(conversation[0], word_to_index),
-                       sentence_to_index(conversation[1], word_to_index)])
+    for line in data:
+        result.append(sentence_to_index(line, word_to_index))
     return result

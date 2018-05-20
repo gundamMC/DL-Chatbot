@@ -2,12 +2,12 @@ import ParseData
 import WordEmbedding
 
 
-test = ParseData.load_cornell("path to movie_conversations.txt", "path to movie_lines.txt")
+question, response = ParseData.load_cornell("path to movie_conversations.txt", "path to movie_lines.txt")
 
-test = ParseData.split_data(test)
+question, question_length = ParseData.split_data(question)
 
 WordEmbedding.create_embedding("path to glove")
 
-test = ParseData.data_to_index(test, WordEmbedding.words_to_index)
+test, test_length = ParseData.data_to_index(question, WordEmbedding.words_to_index)
 
 print(test[0])

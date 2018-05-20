@@ -102,9 +102,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\background.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\background.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Minimize.png" />
@@ -129,9 +127,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Icon_Training_Var.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Button_Send.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

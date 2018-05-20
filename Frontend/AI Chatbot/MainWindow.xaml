@@ -40,38 +40,36 @@
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Resources/background.png"/>
         </Grid.Background>
-        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="60" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0"/>
-        <Rectangle x:Name="Side_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="740" Stroke="Black" VerticalAlignment="Top" Width="70" Opacity="0.4" Margin="0,60,0,0" StrokeThickness="0"/>
-        <Label Content="AI Chatbot Demo" HorizontalAlignment="Left" Margin="23,16,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14"/>
-        <Button HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="60" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
+        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="45" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0"/>
+        <Rectangle x:Name="Side_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="750" Stroke="Black" VerticalAlignment="Top" Width="70" Opacity="0.4" Margin="0,50,0,0" StrokeThickness="0"/>
+        <Label Content="AI Chatbot Demo" HorizontalAlignment="Left" Margin="23,7,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14"/>
+        <Button HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="45" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
             <Image Width="16" Source="pack://application:,,,/Resources/Minimize.png"/>
         </Button>
-        <Button HorizontalAlignment="Left" Margin="1140,0,0,0" VerticalAlignment="Top" Width="60" Height="60" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
+        <Button HorizontalAlignment="Left" Margin="1140,0,0,0" VerticalAlignment="Top" Width="60" Height="45" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
             <Image Width="16" Source="pack://application:,,,/Resources/Close.png"/>
         </Button>
-        <ScrollViewer HorizontalAlignment="Left" Height="540" Margin="70,60,0,0" VerticalAlignment="Top" Width="1130">
-            <StackPanel HorizontalAlignment="Center" Width="1030" Margin="0">
+        <ScrollViewer HorizontalAlignment="Left" Height="550" Margin="70,50,0,0" VerticalAlignment="Top" Width="1130">
+            <StackPanel x:Name="conversation_stack_panel" HorizontalAlignment="Center" Width="1030" Margin="0">
                 <Label Height="40"/>
-                <local:ChatBubbleControl Text="Hhhahaha" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha?" IsUser="False"/>
-                <local:ChatBubbleControl Text="Hhhahaha ha ha hahah hah haha haha hahah haha hhaa haha hah haha haha hah" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha ha ha ha ha oh ha a aaah ha ahh haha hhaa haha hah h?" IsUser="False"/>
-                <local:ChatBubbleControl Text="Hhhahaha" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha?" IsUser="False"/>
-                <local:ChatBubbleControl Text="Hhhahaha" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha?" IsUser="False"/>
-                <local:ChatBubbleControl Text="Hhhahaha" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha?" IsUser="False"/>
-                <local:ChatBubbleControl Text="Hhhahaha" IsUser="True"/>
-                <local:ChatBubbleControl Text="Ha ha ha?" IsUser="False"/>
+                <local:ChatBubbleControl Text="Hello" IsUser="True"/>
+                <local:ChatBubbleControl Text="Hi" IsUser="False"/>
             </StackPanel>
         </ScrollViewer>
-        <Rectangle HorizontalAlignment="Left" Height="4" Margin="70,600,0,0" VerticalAlignment="Top" Width="1130" Fill="#FFCBDADD"/>
-        <TextBox HorizontalAlignment="Left" Margin="75,605,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="140" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" Text="Test" BorderThickness="0"/>
-
-
-
-
+        <Rectangle HorizontalAlignment="Left" Height="4" Margin="70,600,0,0" VerticalAlignment="Top" Width="1130" Fill="#7F78888B"/>
+        <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="75,605,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus"/>
+        <Button x:Name="conversation_tab"  HorizontalAlignment="Left" Margin="4,60,0,0" VerticalAlignment="Top" Width="64" Height="64">
+            <Image x:Name="conversation_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Conversation.png"/>
+        </Button>
+        <Button x:Name="training_tab" HorizontalAlignment="Left" Height="64" Margin="4,139,0,0" VerticalAlignment="Top" Width="64">
+            <Image x:Name="training_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Training.png"/>
+        </Button>
+        <Button x:Name="info_tab" HorizontalAlignment="Left" Height="64" Margin="4,218,0,0" VerticalAlignment="Top" Width="64">
+            <Image x:Name="info_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Info.png"/>
+        </Button>
+        <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1050,750,0,0" VerticalAlignment="Top" Width="119" PreviewMouseDown="send_button_PreviewMouseDown">
+            <Image x:Name="send_button_image" Width="119" Source="pack://application:,,,/Resources/Button_Send.png"/>
+        </Button>
 
     </Grid>
 </Window>

@@ -112,5 +112,26 @@
   <ItemGroup>
     <Resource Include="Resources\Close.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Conversation_Var.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Info_Var.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Conversation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Training.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon_Training_Var.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Button_Send.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -127,4 +127,25 @@
   <data name="Minimize" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Minimize.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Button_Send" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Button_Send.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Conversation" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Conversation.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Conversation_Var" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Conversation_Var.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Info.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Info_Var" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Info_Var.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Training" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Training.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_Training_Var" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icon_Training_Var.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

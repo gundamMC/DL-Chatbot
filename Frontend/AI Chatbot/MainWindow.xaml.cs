@@ -29,5 +29,31 @@ namespace AI_Chatbot
         {
             this.DragMove();
         }
+        
+        private void Input_Field_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(input_field.Text == "Input here")
+                input_field.Text = "";
+        }
+
+        private void input_field_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if(input_field.Text=="")
+                input_field.Text = "Input here";
+        }
+        
+        private void send_button_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (input_field.Text == "Input here" || input_field.Text == "")
+                return;
+            ChatBubbleControl input = new ChatBubbleControl();
+            input.Text = input_field.Text;
+            input.IsUser = true;
+            Label placeHolder = new Label();
+            placeHolder.Height = 40;
+            conversation_stack_panel.Children.Add(input);
+            conversation_stack_panel.Children.Add(placeHolder);
+            input_field.Text = "Input here";
+        }
     }
 }

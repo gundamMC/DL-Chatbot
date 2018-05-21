@@ -34,6 +34,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <ContentPresenter ContentSource="Header"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -49,28 +60,47 @@
         <Button HorizontalAlignment="Left" Margin="1140,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
             <Image Width="16" Source="pack://application:,,,/Resources/Close.png"/>
         </Button>
-        <ScrollViewer HorizontalAlignment="Left" Height="550" Margin="70,50,0,0" VerticalAlignment="Top" Width="1130">
-            <StackPanel x:Name="conversation_stack_panel" HorizontalAlignment="Center" Width="1030" Margin="0">
-                <Label Height="40"/>
-                <local:ChatBubbleControl Text="Hello" IsUser="True"/>
-                <local:ChatBubbleControl Text="Hi" IsUser="False"/>
-            </StackPanel>
-        </ScrollViewer>
-        <Rectangle HorizontalAlignment="Left" Height="4" Margin="70,600,0,0" VerticalAlignment="Top" Width="1130" Fill="#7F78888B"/>
 
-        <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="75,605,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus"/>
+        <TabControl x:Name="Main_TabControl" TabStripPlacement="Left" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0" Margin="-2,48,0,0" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="1200" Height="752">
+            <TabItem>
+                <TabItem.Header>
+                    <Button x:Name="conversation_tab"  HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4" Click="conversation_tab_Click">
+                        <Image x:Name="conversation_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Conversation.png"/>
+                    </Button>
+                </TabItem.Header>
+                <Grid>
+                    <ScrollViewer HorizontalAlignment="Left" Height="550" Margin="0" VerticalAlignment="Top" Width="1130">
+                        <StackPanel x:Name="conversation_stack_panel" HorizontalAlignment="Center" Width="1030" Margin="0">
+                            <Label Height="40"/>
+                            <local:ChatBubbleControl Text="Hello" IsUser="True"/>
+                            <local:ChatBubbleControl Text="Hi" IsUser="False"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <Rectangle HorizontalAlignment="Left" Height="4" Margin="0,550,0,0" VerticalAlignment="Top" Width="1130" Fill="#7F78888B"/>
 
-        <Button x:Name="conversation_tab"  HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4">
-            <Image x:Name="conversation_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Conversation_Var.png"/>
-        </Button>
-        <Button x:Name="training_tab" HorizontalAlignment="Left" Margin="0,120,0,0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4">
-            <Image x:Name="training_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Training.png"/>
-        </Button>
-        <Button x:Name="info_tab" HorizontalAlignment="Left" Margin="0,190,0,0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4">
-            <Image x:Name="info_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Info.png"/>
-        </Button>
+                    <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="5,555,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus"/>
 
-        <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1050,750,0,0" VerticalAlignment="Top" Width="119" Click="send_button_Click" Background="#FF1C617B" BorderThickness="0" Content="Send" Foreground="White" FontFamily="Microsoft YaHei" FontSize="16" BorderBrush="#FF0D455B"/>
+
+                    <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1000,700,0,0" VerticalAlignment="Top" Width="100" Click="send_button_Click" Background="#FF1C617B" BorderThickness="0" Content="Send" Foreground="White" FontFamily="Microsoft YaHei" FontSize="16" BorderBrush="#FF0D455B"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <Button x:Name="training_tab" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4" Click="training_tab_Click">
+                        <Image x:Name="training_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Training.png"/>
+                    </Button>
+                </TabItem.Header>
+                <Grid/>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <Button x:Name="info_tab" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4" Click="info_tab_Click">
+                        <Image x:Name="info_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Info.png"/>
+                    </Button>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
 
     </Grid>
 </Window>

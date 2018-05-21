@@ -83,9 +83,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Conversation {
+        internal static System.Drawing.Bitmap Icon_0 {
             get {
-                object obj = ResourceManager.GetObject("Icon_Conversation", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_0", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Conversation_Var {
+        internal static System.Drawing.Bitmap Icon_0_Selected {
             get {
-                object obj = ResourceManager.GetObject("Icon_Conversation_Var", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_0_Selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Info {
+        internal static System.Drawing.Bitmap Icon_1 {
             get {
-                object obj = ResourceManager.GetObject("Icon_Info", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Info_Var {
+        internal static System.Drawing.Bitmap Icon_1_Selected {
             get {
-                object obj = ResourceManager.GetObject("Icon_Info_Var", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_1_Selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Training {
+        internal static System.Drawing.Bitmap Icon_2 {
             get {
-                object obj = ResourceManager.GetObject("Icon_Training", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace AI_Chatbot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Icon_Training_Var {
+        internal static System.Drawing.Bitmap Icon_2_Selected {
             get {
-                object obj = ResourceManager.GetObject("Icon_Training_Var", resourceCulture);
+                object obj = ResourceManager.GetObject("Icon_2_Selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

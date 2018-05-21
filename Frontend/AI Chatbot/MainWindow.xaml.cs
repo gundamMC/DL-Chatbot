@@ -23,6 +23,9 @@ namespace AI_Chatbot
         public MainWindow()
         {
             InitializeComponent();
+
+            previousIcon = conversation_tab_image;
+            previousImage = conversation_tab_image.Source.Clone();
         }
 
         private void Title_Bar_MouseDown(object sender, MouseButtonEventArgs e)
@@ -56,6 +59,46 @@ namespace AI_Chatbot
             conversation_stack_panel.Children.Add(input);
 
             input_field.Text = "Input here";
+        }
+
+        Image previousIcon;
+        ImageSource previousImage;
+
+        private void conversation_tab_Click(object sender, RoutedEventArgs e)
+        {
+            Main_TabControl.SelectedIndex = 0;
+
+            previousIcon.Source = previousImage;
+
+            previousIcon = conversation_tab_image;
+            previousImage = conversation_tab_image.Source.Clone();
+
+            conversation_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Conversation_Var.png"));
+            
+        }
+
+        private void training_tab_Click(object sender, RoutedEventArgs e)
+        {
+            Main_TabControl.SelectedIndex = 1;
+
+            previousIcon.Source = previousImage;
+
+            previousIcon = training_tab_image;
+            previousImage = training_tab_image.Source.Clone();
+
+            training_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Training_Var.png"));
+        }
+
+        private void info_tab_Click(object sender, RoutedEventArgs e)
+        {
+            Main_TabControl.SelectedIndex = 2;
+
+            previousIcon.Source = previousImage;
+
+            previousIcon = info_tab_image;
+            previousImage = info_tab_image.Source.Clone();
+
+            info_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Info_Var.png"));
         }
     }
 }

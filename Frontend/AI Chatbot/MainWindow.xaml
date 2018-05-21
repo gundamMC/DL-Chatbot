@@ -65,7 +65,7 @@
             <TabItem>
                 <TabItem.Header>
                     <Button x:Name="conversation_tab"  HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4" Click="conversation_tab_Click">
-                        <Image x:Name="conversation_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Conversation.png"/>
+                        <Image x:Name="conversation_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Conversation_Var.png"/>
                     </Button>
                 </TabItem.Header>
                 <Grid>

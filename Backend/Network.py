@@ -17,10 +17,11 @@ class ChatbotNetwork:
         self.n_hidden = 128
 
         # Tensorflow placeholders
-        self.x = tf.placeholder("float", [None, self.max_sequence])
-        self.x_length = tf.placeholder("float", [None])
+        self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
+        self.x_length = tf.placeholder(tf.int32, [None])
         self.y = tf.placeholder("float", [None, self.max_sequence])
-        self.y_length = tf.placeholder("float", [None])
+        self.y_length = tf.placeholder(tf.int32, [None])
+        self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
 
         # Network parameters
         self.cell_encode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
@@ -39,13 +40,14 @@ class ChatbotNetwork:
         self.sess.run(tf.global_variables_initializer())
 
         # Word embedding
-        self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
         embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
         self.sess.run(self.word_embedding.assign(embedding_placeholder),
                       feed_dict={embedding_placeholder: WordEmbedding.embeddings})
 
     def network(self, mode="train"):
         embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
+
+        print(embedded_x.shape)
 
         encoder_out, encoder_states = tf.nn.dynamic_rnn(
             self.cell_encode,

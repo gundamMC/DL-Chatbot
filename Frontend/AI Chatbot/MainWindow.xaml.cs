@@ -25,7 +25,7 @@ namespace AI_Chatbot
             InitializeComponent();
 
             previousIcon = conversation_tab_image;
-            previousImage = conversation_tab_image.Source.Clone();
+            previousImage = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Conversation.png"));
         }
 
         private void Title_Bar_MouseDown(object sender, MouseButtonEventArgs e)
@@ -48,7 +48,7 @@ namespace AI_Chatbot
 
         private void send_button_Click(object sender, RoutedEventArgs e)
         {
-            if (input_field.Text == "Input here" || input_field.Text == "")
+            if (input_field.Text == "Input here" || String.IsNullOrWhiteSpace(input_field.Text))
                 return;
 
             // Testing
@@ -99,6 +99,24 @@ namespace AI_Chatbot
             previousImage = info_tab_image.Source.Clone();
 
             info_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Info_Var.png"));
+        }
+
+        private void input_field_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                if (input_field.Text == "Input here" || String.IsNullOrWhiteSpace(input_field.Text))
+                    return;
+
+                // Testing
+                ChatBubbleControl input = new ChatBubbleControl() { IsUser = true, Text = input_field.Text };
+
+                // no need for margins since it will be a strickly one-to-one conversation
+                // (the user will not be able to send 2 messages in a row)
+                conversation_stack_panel.Children.Add(input);
+
+                input_field.Text = "";
+            }
         }
     }
 }

@@ -78,7 +78,7 @@
                     </ScrollViewer>
                     <Rectangle HorizontalAlignment="Left" Height="4" Margin="0,550,0,0" VerticalAlignment="Top" Width="1130" Fill="#7F78888B"/>
 
-                    <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="5,555,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus"/>
+                    <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="5,555,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus" KeyDown="input_field_KeyDown"/>
 
 
                     <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1000,700,0,0" VerticalAlignment="Top" Width="100" Click="send_button_Click" Background="#FF1C617B" BorderThickness="0" Content="Send" Foreground="White" FontFamily="Microsoft YaHei" FontSize="16" BorderBrush="#FF0D455B"/>

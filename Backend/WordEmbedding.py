@@ -28,28 +28,30 @@ def create_embedding(glove_path):
         embeddings.append(embedding)
         words_to_index[word] = index
 
+    embeddings = np.array(embeddings)
+
+    zeros = np.zeros((4, 29))
+
     words_to_index["<UNK>"] = len(words)
     words.append("<UNK>")
-    unk = [[0] * 50, [1], [0], [0], [0]]
-    embeddings.append(unk)
+    zeros[0, 25] = 1
 
     words_to_index["<PAD>"] = len(words)
     words.append("<PAD>")
-    pad = [[0] * 50, [0], [1], [0], [0]]
-    embeddings.append(pad)
+    zeros[1, 26] = 1
 
     words_to_index["<EOS>"] = len(words)
+    global end
     end = len(words)
     words.append("<EOS>")
-    eos = [[0] * 50, [0], [0], [1], [0]]
-    embeddings.append(eos)
+    zeros[2, 27] = 1
 
     words_to_index["<GO>"] = len(words)
+    global start
     start = len(words)
     words.append("<GO>")
-    eos = [[0] * 50, [0], [0], [0], [1]]
-    embeddings.append(eos)
+    zeros[3, 28] = 1
 
-    embeddings = np.array(embeddings)
+    embeddings = np.vstack((embeddings, zeros))
 
     print_message("Word vector loaded")

@@ -75,21 +75,18 @@ def load_cornell(path_conversations, path_lines):
 def split_sentence(sentence):
     # collect independent words
     result = re.findall(r"[\w']+|[.,!?;]", sentence)
-    return result, len(result)
+    return result
 
 
 def split_data(data):
     result = []
-    length = []
     for line in data:
-        tmp, tmp_length = split_sentence(line)
-        result.append(tmp)
-        length.append(tmp_length)
-    return result, length
+        result.append(split_sentence(line))
+    return result
 
 
 def sentence_to_index(sentence, word_to_index):
-    result = []
+    result = [word_to_index["<GO>"]]
     for word in sentence:
         if word in word_to_index:
             result.append(word_to_index[word])
@@ -97,16 +94,19 @@ def sentence_to_index(sentence, word_to_index):
             result.append(word_to_index["<UNK>"])
     # max sequence length of 50
     if len(result) < 49:  # last one will always be eos
-        result.extend([word_to_index["<PAD>"]] * (49 - len(result)))
         result.append(word_to_index["<EOS>"])
+        result.extend([word_to_index["<PAD>"]] * (50 - len(result)))
     else:
-        result = result[:50]
+        result = result[:49]
         result.append(word_to_index["<EOS>"])
-    return result
+    return result, len(result)
 
 
 def data_to_index(data, word_to_index):
     result = []
+    lengths = []
     for line in data:
-        result.append(sentence_to_index(line, word_to_index))
-    return result
+        tmp, tmp_length = sentence_to_index(line, word_to_index)
+        result.append(tmp)
+        lengths.append(tmp_length)
+    return result, lengths

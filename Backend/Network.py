@@ -1,37 +1,38 @@
 import tensorflow as tf
 import numpy as np
 import WordEmbedding
+import os
 
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.01, batch_size=256, vector_count=20000, vector_length=54):
+    def __init__(self, learning_rate=0.01, batch_size=4):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
 
         # Network hyperparameters
-        self.n_vector = vector_length  # glove 50 + 3 special tokens
-        self.vector_count = vector_count
+        self.n_vector = WordEmbedding.embeddings.shape[1]
+        self.vector_count = WordEmbedding.embeddings.shape[0]
         self.max_sequence = 50
-        self.n_hidden = 128
+        self.n_hidden = 16
 
         # Tensorflow placeholders
         self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.x_length = tf.placeholder(tf.int32, [None])
-        self.y = tf.placeholder("float", [None, self.max_sequence])
+        self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.y_length = tf.placeholder(tf.int32, [None])
         self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
 
         # Network parameters
         self.cell_encode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
         self.cell_decode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.projection_layer = tf.layers.Dense(self.vector_count)
 
         # Optimization
-        crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-            labels=self.y, logits=self.network())
-        self.cost = (tf.reduce_sum(crossent) / self.batch_size)
-        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
+        self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+            labels=tf.one_hot(self.y, self.vector_count, axis=-1), logits=self.network()))
+        self.train_op = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
         config = tf.ConfigProto()
@@ -47,8 +48,6 @@ class ChatbotNetwork:
     def network(self, mode="train"):
         embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
 
-        print(embedded_x.shape)
-
         encoder_out, encoder_states = tf.nn.dynamic_rnn(
             self.cell_encode,
             inputs=embedded_x,
@@ -56,11 +55,11 @@ class ChatbotNetwork:
             sequence_length=self.x_length,
             swap_memory=True)
 
-        projection_layer = tf.layers.Dense(self.vector_count)
+        embedded_y = tf.nn.embedding_lookup(self.word_embedding, self.y)
 
         if mode == "train":
             helper = tf.contrib.seq2seq.TrainingHelper(
-                inputs=self.y,
+                inputs=embedded_y,
                 sequence_length=self.y_length
             )
 
@@ -68,27 +67,27 @@ class ChatbotNetwork:
                 self.cell_decode,
                 helper,
                 encoder_states,
-                output_layer=projection_layer
+                output_layer=self.projection_layer
             )
 
-        else:
+        # else:
 
             # Replicate encoder infos beam_width times
-            decoder_initial_state = tf.contrib.seq2seq.tile_batch(
-                encoder_states, multiplier=3)
+            # decoder_initial_state = tf.contrib.seq2seq.tile_batch(
+            #     encoder_states, multiplier=3)
+            #
+            # decoder = tf.contrib.seq2seq.BeamSearchDecoder(
+            #             cell=self.cell_decode,
+            #             embedding=self.word_embedding,
+            #             start_tokens=tf.tile(WordEmbedding.start, [self.x.shape[0]]),
+            #             end_token=WordEmbedding.end,
+            #             initial_state=decoder_initial_state,
+            #             beam_width=3,
+            #             output_layer=projection_layer,
+            #             length_penalty_weight=0.0
+            # )
 
-            decoder = tf.contrib.seq2seq.BeamSearchDecoder(
-                        cell=self.cell_decode,
-                        embedding=self.word_embedding,
-                        start_tokens=tf.tile(WordEmbedding.start, [self.x.shape[0]]),
-                        end_token=WordEmbedding.end,
-                        initial_state=decoder_initial_state,
-                        beam_width=3,
-                        output_layer=projection_layer,
-                        length_penalty_weight=0.0
-            )
-
-        outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=False)
+        outputs, _, lengths = tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=False)
 
         logits = outputs.rnn_output
 
@@ -120,7 +119,7 @@ class ChatbotNetwork:
                                     self.y_length: batch_y_length
                                 })
 
-                    print("epoch:", epoch, "- (", batch, "/", self.batch_size, ") -", cost_value)
+                    print("epoch:", epoch, "- (", batch, "/", len(mini_batches_x), ") -", cost_value)
 
     def predict(self, sentence):
         # TODO
@@ -134,19 +133,19 @@ class ChatbotNetwork:
         # shuffle data
         permutation = list(np.random.permutation(m))
         shuffled = []
-        for data in data_lists:
-            shuffled.append(data[permutation])
+        for i in range(len(data_lists)):
+            shuffled.append(data_lists[i][permutation])
 
         mini_batch_number = int(m / float(mini_batch_size))
 
         # split into mini batches
-        for data in shuffled:
+        for i in range(len(shuffled)):
             tmp = []
             for batch in range(0, mini_batch_number):
-                tmp.append(data[batch * mini_batch_size: (batch + 1) * mini_batch_size])
+                tmp.append(data_lists[i][batch * mini_batch_size: (batch + 1) * mini_batch_size])
 
             if m % mini_batch_size != 0:
-                tmp.append(data[mini_batch_number * mini_batch_size:])
+                tmp.append(data_lists[i][mini_batch_number * mini_batch_size:])
 
             mini_batches.append(tmp)
 

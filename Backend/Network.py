@@ -6,7 +6,7 @@ import ParseData
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.001, batch_size=16):
+    def __init__(self, learning_rate=0.001, batch_size=16, restore=False):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -22,7 +22,6 @@ class ChatbotNetwork:
         self.x_length = tf.placeholder(tf.int32, [None])
         self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.y_length = tf.placeholder(tf.int32, [None])
-
         with tf.device('/cpu:0'):
             self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
 
@@ -37,17 +36,20 @@ class ChatbotNetwork:
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
-        #config = tf.ConfigProto()
-        #config.gpu_options.allow_growth = True
-        #self.sess = tf.Session(config=config)
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
 
-        # Word embedding
-        with tf.device('/cpu:0'):
-            embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
-            self.sess.run(self.word_embedding.assign(embedding_placeholder),
-                          feed_dict={embedding_placeholder: WordEmbedding.embeddings})
+        # Saver object which will save/restore all the variables
+        self.saver = tf.train.Saver()
+
+        if restore:
+            self.saver.restore(self.sess, "./")
+        else:
+            # Word embedding
+            with tf.device('/cpu:0'):
+                embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
+                self.sess.run(self.word_embedding.assign(embedding_placeholder),
+                              feed_dict={embedding_placeholder: WordEmbedding.embeddings})
 
     def network(self, mode="train"):
         with tf.device('/cpu:0'):
@@ -147,7 +149,8 @@ class ChatbotNetwork:
                     print(result)
 
                     # test 2
-                    test, test_length = ParseData.data_to_index([["how", "are", "you", "?"]], WordEmbedding.words_to_index)
+                    test, test_length = ParseData.data_to_index([["how", "are", "you", "?"]],
+                                                                WordEmbedding.words_to_index)
                     test_output = self.sess.run(self.network(mode="infer")[0],
                                                 feed_dict={
                                                     self.x: np.array(test),
@@ -164,8 +167,8 @@ class ChatbotNetwork:
 
                     # end
 
-                    mini_batches_x, mini_batches_x_length, mini_batches_y, mini_batches_y_length \
-                        = self.random_mini_batches([train_x, x_length, train_y, y_length], self.batch_size)
+            mini_batches_x, mini_batches_x_length, mini_batches_y, mini_batches_y_length \
+                = self.random_mini_batches([train_x, x_length, train_y, y_length], self.batch_size)
 
             for batch in range(len(mini_batches_x)):
                 batch_x = mini_batches_x[batch]
@@ -190,9 +193,22 @@ class ChatbotNetwork:
 
                     print("epoch:", epoch, "- (", batch, "/", len(mini_batches_x), ") -", cost_value)
 
-    def predict(self, sentence):
-        # TODO
-        pass
+    def predict(self, sentence, sentence_length):
+        test_output = self.sess.run(self.network(mode="infer")[0],
+                                    feed_dict={
+                                        self.x: np.array(sentence),
+                                        self.x_length: np.array(sentence_length)
+                                    })
+        result = ""
+        for i in test_output:
+            if len(i) == 3:
+                result = result + WordEmbedding.words[round(i[0])] + " "
+            else:
+                break
+        return result
+
+    def save(self):
+        self.saver.save(self.sess, 'model')
 
     @staticmethod
     def random_mini_batches(data_lists, mini_batch_size):

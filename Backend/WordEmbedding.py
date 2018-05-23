@@ -1,4 +1,3 @@
-from Utils import print_message
 import numpy as np
 
 
@@ -10,53 +9,52 @@ start = 0
 end = 0
 
 
-def create_embedding(glove_path):
+def create_embedding(glove_path, save_embedding=True):
     global words
     words = []
     global words_to_index
     words_to_index = {}
     global embeddings
     embeddings = []
-    print_message("Loading word vector")
 
-    # add special tokens
-    zeros = np.zeros((4, 54))
+    print("Loading word vector")
 
     words_to_index["<UNK>"] = 0
     words.append("<UNK>")
-    zeros[0, 50] = 1
 
     words_to_index["<PAD>"] = 1
     words.append("<PAD>")
-    zeros[1, 51] = 1
 
     words_to_index["<EOS>"] = 2
     global end
     end = 2
     words.append("<EOS>")
-    zeros[2, 52] = 1
 
     words_to_index["<GO>"] = 3
     global start
     start = 3
     words.append("<GO>")
-    zeros[3, 53] = 1
 
     f = open(glove_path, 'r', encoding='utf8')
     for index, line in enumerate(f):
         split_line = line.split(' ')
         word = split_line[0]
-        embedding = [float(val) for val in split_line[1:]]
+        if save_embedding:
+            embedding = [float(val) for val in split_line[1:]]
+            embedding.extend([0, 0, 0, 0])
+            embeddings.append(embedding)
         words.append(word)
-        embedding.extend([0, 0, 0, 0])
-        embeddings.append(embedding)
         words_to_index[word] = index + 4  # 4 special tokens
 
-    embeddings = np.array(embeddings)
+    if save_embedding:
+        # add special tokens
+        zeros = np.zeros((4, 54))
+        zeros[0, 50] = 1
+        zeros[1, 51] = 1
+        zeros[2, 52] = 1
+        zeros[3, 53] = 1
 
-    embeddings = np.vstack((zeros, embeddings))
+        embeddings = np.array(embeddings)
+        embeddings = np.vstack((zeros, embeddings))
 
-    assert embeddings[end, 52] == 1
-    assert embeddings[start, 53] == 1
-
-    print_message("Word vector loaded")
+    print("Word vector loaded")

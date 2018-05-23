@@ -34,10 +34,11 @@ while True:
                 break
             else:
                 # predict the result
-                input_x, x_length = ParseData.data_to_index(data.replace("input: "), WordEmbedding.words_to_index)
+                input_x, x_length = ParseData.data_to_index(ParseData.split_data([data.replace("input: ", '', 1)]),
+                                                            WordEmbedding.words_to_index)
                 result = network.predict(input_x, x_length)
                 Utils.print_message(result)
 
         except socket.timeout:
             print('Connection timed out')
-            continue
+            break

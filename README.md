@@ -40,7 +40,19 @@ pip install numpy
 ## Training
 It is recommended to use the pre-trained network provided in the backend folder.
 Training a new network from scratch will require a lot of memory and computing power. **Around 5GB VRAM and 2-3GB RAM**
-(Train.py is optimized for _Tensorflow-gpu_)
+(The network is optimized for Tensorflow-GPU and runs on both GPU and CPU. To change this, modify `network.py`)
+
+To train the network, run `Train.py` and input the number of epochs to train for.
+Input `save` to save the network for the socket server and `exit` to exit (_without_ saving).
+For example, the following inputs will save the network after 50 epochs and another 100 epochs
+
+```
+Train epochs: 50
+Train epochs: save
+Train epochs: 100
+Train epochs: save
+Train epochs: exit
+```
 
 ## License
 [Apache License 2.0](https://github.com/gundamMC/AI-Chatbot/blob/master/LICENSE)

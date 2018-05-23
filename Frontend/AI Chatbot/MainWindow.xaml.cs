@@ -99,6 +99,15 @@ namespace AI_Chatbot
             previousImage = info_tab_image.Source.Clone();
 
             info_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Info_Var.png"));
+
+            Info_Textblock.Text = "AI Chatbot\n" +
+                "*This program implements basic artificial intelligence to handle daily conversation\n" +
+                "\n" +
+                "Github: gundamMC/AI-Chatbot\n"+
+                "____________\n" +
+                "Developers\n" +
+                "Backend by @gundamMC\n" +
+                "Frontend by @gundamMC & @Everwinds";
         }
 
         private void input_field_KeyDown(object sender, KeyEventArgs e)

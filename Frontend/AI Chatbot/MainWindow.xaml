@@ -51,7 +51,7 @@
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Resources/background.png"/>
         </Grid.Background>
-        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0"/>
+        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0" Margin="3,0,0,0"/>
         <Rectangle x:Name="Side_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="540" Stroke="Black" VerticalAlignment="Top" Width="70" Opacity="0.4" Margin="0,260,0,0" StrokeThickness="0"/>
         <Label Content="AI Chatbot Demo" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14" Height="50" VerticalContentAlignment="Center"/>
         <Button HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
@@ -91,14 +91,23 @@
                         <Image x:Name="training_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Training.png"/>
                     </Button>
                 </TabItem.Header>
-                <Grid/>
+                <Grid>
+                    <TextBox x:Name="IP_Textbox" HorizontalAlignment="Left" Height="62" Margin="360,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="20"/>
+                    <TextBox x:Name="Port_Textbox" HorizontalAlignment="Left" Height="62" Margin="360,242,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="20"/>
+                    <Label Content="IP" HorizontalAlignment="Left" Height="45" Margin="499,66,0,0" VerticalAlignment="Top" Width="38" Foreground="#FFCDF9FF" FontSize="25"/>
+                    <Label Content="Port" HorizontalAlignment="Left" Height="45" Margin="486,197,0,0" VerticalAlignment="Top" Width="63" Foreground="#FFCDF9FF" FontSize="25"/>
+                    <Button Content="Connect" HorizontalAlignment="Left" Height="47" Margin="395,373,0,0" VerticalAlignment="Top" Width="253" Background="#B2236790" Foreground="#FFCFF5F6" FontSize="20" BorderBrush="#B22B71A9"/>
+                </Grid>
             </TabItem>
-            <TabItem>
+            <TabItem Focusable="False">
                 <TabItem.Header>
                     <Button x:Name="info_tab" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Top" Width="70" Height="70" Background="#2f3437" BorderThickness="0" BorderBrush="#FF1C1E1F" Opacity="0.4" Click="info_tab_Click">
                         <Image x:Name="info_tab_image" Width="64" Source="pack://application:,,,/Resources/Icon_Info.png"/>
                     </Button>
                 </TabItem.Header>
+                <Grid>
+                    <TextBlock x:Name="Info_Textblock" HorizontalAlignment="Left" Height="522" Margin="32,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="597" FontSize="20" Background="Transparent" Foreground="#FFCCDFE5"/>
+                </Grid>
             </TabItem>
         </TabControl>
 

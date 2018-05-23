@@ -6,7 +6,7 @@ import ParseData
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.01, batch_size=16):
+    def __init__(self, learning_rate=0.001, batch_size=16):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -15,7 +15,7 @@ class ChatbotNetwork:
         self.n_vector = WordEmbedding.embeddings.shape[1]
         self.vector_count = WordEmbedding.embeddings.shape[0]
         self.max_sequence = 50
-        self.n_hidden = 128
+        self.n_hidden = 64
 
         # Tensorflow placeholders
         self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
@@ -135,7 +135,10 @@ class ChatbotNetwork:
 
                     result = ""
                     for i in test_output:
-                        result = result + WordEmbedding.words[i[0]] + "(" + str(i[0]) + ")" + " "
+                        if len(i) == 3:
+                            result = result + WordEmbedding.words[round(i[0])] + "(" + str(i[0]) + ")" + " "
+                        else:
+                            break
                     print(result)
 
                     result = ""
@@ -153,8 +156,10 @@ class ChatbotNetwork:
 
                     result = ""
                     for i in test_output:
-                        result = result + WordEmbedding.words[i[0]] + "(" + str(i[0]) + ")" + " "
-
+                        if len(i) == 3:
+                            result = result + WordEmbedding.words[round(i[0])] + "(" + str(i[0]) + ")" + " "
+                        else:
+                            break
                     print(result)
 
                     # end

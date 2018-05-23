@@ -74,7 +74,7 @@ def load_cornell(path_conversations, path_lines):
 
 def split_sentence(sentence):
     # collect independent words
-    result = re.findall(r"[\w']+|[.,!?;]", sentence)
+    result = re.findall(r"[\w]+|[.,!?;'\"]+", sentence)
     return result
 
 
@@ -96,9 +96,6 @@ def sentence_to_index(sentence, word_to_index):
         else:
             result.append(word_to_index["<UNK>"])
             unks += 1
-
-    if unks > 2:
-        return None, None
 
     # max sequence length of 50
     if len(result) < 49:  # last one will always be eos

@@ -11,10 +11,10 @@ namespace AI_Chatbot
     {
         private TcpClient clientSocket;
 
-        public Communicator()
+        public Communicator(String ip, int port)
         {
             clientSocket = new System.Net.Sockets.TcpClient();
-            clientSocket.Connect("127.0.0.1", 8888);
+            clientSocket.Connect(ip, port);
         }
         
         public String SendMessage(String str)
@@ -22,9 +22,9 @@ namespace AI_Chatbot
             NetworkStream serverStream = clientSocket.GetStream();
             byte[] outStream = System.Text.Encoding.UTF8.GetBytes(str);
             serverStream.Write(outStream, 0, outStream.Length);
-            byte[] inStream = new byte[10025];
-            serverStream.Read(inStream, 0, (int)clientSocket.ReceiveBufferSize);
-            String response = System.Text.Encoding.UTF8.GetString(inStream);
+            byte[] inStream = new byte[1024];
+            Int32 bytes = serverStream.Read(inStream, 0, (int)inStream.Length);
+            String response = System.Text.Encoding.UTF8.GetString(inStream, 0, bytes);
             return response;
         }
 

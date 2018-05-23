@@ -51,7 +51,7 @@
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Resources/background.png"/>
         </Grid.Background>
-        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0" Margin="3,0,0,0"/>
+        <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0" Margin="0"/>
         <Rectangle x:Name="Side_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="540" Stroke="Black" VerticalAlignment="Top" Width="70" Opacity="0.4" Margin="0,260,0,0" StrokeThickness="0"/>
         <Label Content="AI Chatbot Demo" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14" Height="50" VerticalContentAlignment="Center"/>
         <Button HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
@@ -69,19 +69,20 @@
                     </Button>
                 </TabItem.Header>
                 <Grid>
-                    <ScrollViewer HorizontalAlignment="Left" Height="550" Margin="0" VerticalAlignment="Top" Width="1130">
+                    <ScrollViewer x:Name="Conversation_ScrollViewer" HorizontalAlignment="Left" Height="550" Margin="0" VerticalAlignment="Top" Width="1125">
                         <StackPanel x:Name="conversation_stack_panel" HorizontalAlignment="Center" Width="1030" Margin="0">
                             <Label Height="40"/>
                             <local:ChatBubbleControl Text="Hello" IsUser="True"/>
                             <local:ChatBubbleControl Text="Hi" IsUser="False"/>
+                            <Label Height="40"/>
                         </StackPanel>
                     </ScrollViewer>
                     <Rectangle HorizontalAlignment="Left" Height="4" Margin="0,550,0,0" VerticalAlignment="Top" Width="1130" Fill="#7F78888B"/>
 
-                    <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="5,555,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Input here" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus" KeyDown="input_field_KeyDown"/>
+                    <TextBox x:Name="input_field" HorizontalAlignment="Left" Margin="5,555,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="126" Width="1125" Foreground="#FFCBDADD" FontSize="20" Background="{x:Null}" Padding="5" BorderThickness="0" Text="Please connect to the socket server" PreviewMouseDown="Input_Field_PreviewMouseDown" CaretBrush="LightSkyBlue" LostFocus="input_field_LostFocus" KeyDown="input_field_KeyDown" IsEnabled="False"/>
 
 
-                    <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1000,700,0,0" VerticalAlignment="Top" Width="100" Click="send_button_Click" Background="#FF1C617B" BorderThickness="0" Content="Send" Foreground="White" FontFamily="Microsoft YaHei" FontSize="16" BorderBrush="#FF0D455B"/>
+                    <Button x:Name="send_button" HorizontalAlignment="Left" Height="32" Margin="1000,700,0,0" VerticalAlignment="Top" Width="100" Click="send_button_Click" Background="#FF1C617B" BorderThickness="0" Content="Send" Foreground="White" FontFamily="Microsoft YaHei" FontSize="16" BorderBrush="#FF0D455B" IsEnabled="False"/>
 
                 </Grid>
             </TabItem>
@@ -92,11 +93,12 @@
                     </Button>
                 </TabItem.Header>
                 <Grid>
-                    <TextBox x:Name="IP_Textbox" HorizontalAlignment="Left" Height="62" Margin="360,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="20"/>
-                    <TextBox x:Name="Port_Textbox" HorizontalAlignment="Left" Height="62" Margin="360,242,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="20"/>
-                    <Label Content="IP" HorizontalAlignment="Left" Height="45" Margin="499,66,0,0" VerticalAlignment="Top" Width="38" Foreground="#FFCDF9FF" FontSize="25"/>
-                    <Label Content="Port" HorizontalAlignment="Left" Height="45" Margin="486,197,0,0" VerticalAlignment="Top" Width="63" Foreground="#FFCDF9FF" FontSize="25"/>
-                    <Button Content="Connect" HorizontalAlignment="Left" Height="47" Margin="395,373,0,0" VerticalAlignment="Top" Width="253" Background="#B2236790" Foreground="#FFCFF5F6" FontSize="20" BorderBrush="#B22B71A9"/>
+                    <TextBox x:Name="IP_Textbox" HorizontalAlignment="Center" Height="62" Margin="0,116,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="36" FontFamily="Microsoft YaHei" Text="localhost"/>
+                    <TextBox x:Name="Port_Textbox" HorizontalAlignment="Center" Height="62" Margin="0,242,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="326" Background="#4C7FDCEA" Foreground="#FFE2EAEB" FontSize="36" FontFamily="Microsoft YaHei" Text="8089"/>
+                    <Label Content="IP" HorizontalAlignment="Center" Height="45" Margin="0,66,0,0" VerticalAlignment="Top" Width="38" Foreground="#FFCDF9FF" FontSize="25"/>
+                    <Label Content="Port" HorizontalAlignment="Center" Height="45" Margin="0,197,0,0" VerticalAlignment="Top" Width="63" Foreground="#FFCDF9FF" FontSize="25"/>
+                    <Button x:Name="Connect_Button" Content="Connect" HorizontalAlignment="Center" Height="47" Margin="0,373,0,0" VerticalAlignment="Top" Width="253" Background="#B2236790" Foreground="#FFCFF5F6" FontSize="20" BorderBrush="#B22B71A9" Click="Connect_Button_Click"/>
+                    <TextBlock x:Name="Console_Textblock" HorizontalAlignment="Center" Margin="0,500,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Background="Transparent" Foreground="#FFCCDFE5"/>
                 </Grid>
             </TabItem>
             <TabItem Focusable="False">
@@ -106,7 +108,23 @@
                     </Button>
                 </TabItem.Header>
                 <Grid>
-                    <TextBlock x:Name="Info_Textblock" HorizontalAlignment="Left" Height="522" Margin="32,31,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="597" FontSize="20" Background="Transparent" Foreground="#FFCCDFE5"/>
+                    <TextBlock x:Name="Info_Textblock" HorizontalAlignment="Center" Margin="32,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Background="Transparent" Foreground="#FFCCDFE5">
+                        AI Chatbot is a demo casual chatbot using Tensorflow and a WPF GUI. The Tensorflow models runs on python and communicates with the C# GUI through TCP sockets.
+                        More information about the Tensorflow model and deep learning can be found in the backend folder.
+                        <LineBreak/>
+                        <LineBreak/>
+                        Usage and other information can be found in README.md or on github (gundamMC/AI-Chatbot).
+                    </TextBlock>
+                    <TextBlock x:Name="Info_Textblock_2" HorizontalAlignment="Center" Margin="41,546,598,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Background="Transparent" Foreground="#FFCCDFE5" Width="485">
+                        Contributors:
+                        <LineBreak/>
+                        Tensorflow model : @gundamMC
+                        <LineBreak/>
+                        WPF GUI: @Everwind @gundamMC
+                        <LineBreak/>
+                        <LineBreak/>
+                        License: Apache License 2.0
+                    </TextBlock>
                 </Grid>
             </TabItem>
         </TabControl>

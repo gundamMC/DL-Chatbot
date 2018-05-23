@@ -26,6 +26,8 @@ namespace AI_Chatbot
 
             previousIcon = conversation_tab_image;
             previousImage = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Conversation.png"));
+
+            Disable_Conversation();
         }
 
         private void Title_Bar_MouseDown(object sender, MouseButtonEventArgs e)
@@ -54,9 +56,9 @@ namespace AI_Chatbot
             // Testing
             ChatBubbleControl input = new ChatBubbleControl() { IsUser = true, Text = input_field.Text };
 
-            // no need for margins since it will be a strickly one-to-one conversation
-            // (the user will not be able to send 2 messages in a row)
-            conversation_stack_panel.Children.Add(input);
+            conversation_stack_panel.Children.Insert(conversation_stack_panel.Children.Count - 1, input);
+
+            Send(input_field.Text);
 
             input_field.Text = "Input here";
         }
@@ -99,15 +101,6 @@ namespace AI_Chatbot
             previousImage = info_tab_image.Source.Clone();
 
             info_tab_image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icon_Info_Var.png"));
-
-            Info_Textblock.Text = "AI Chatbot\n" +
-                "*This program implements basic artificial intelligence to handle daily conversation\n" +
-                "\n" +
-                "Github: gundamMC/AI-Chatbot\n"+
-                "____________\n" +
-                "Developers\n" +
-                "Backend by @gundamMC\n" +
-                "Frontend by @gundamMC & @Everwinds";
         }
 
         private void input_field_KeyDown(object sender, KeyEventArgs e)
@@ -120,12 +113,65 @@ namespace AI_Chatbot
                 // Testing
                 ChatBubbleControl input = new ChatBubbleControl() { IsUser = true, Text = input_field.Text };
 
-                // no need for margins since it will be a strickly one-to-one conversation
-                // (the user will not be able to send 2 messages in a row)
-                conversation_stack_panel.Children.Add(input);
+                conversation_stack_panel.Children.Insert(conversation_stack_panel.Children.Count - 1, input);
+
+                Send(input_field.Text);
 
                 input_field.Text = "";
+                
             }
         }
+
+        private void Send(String message)
+        {
+            String response = communicator.SendMessage("input: " + message);
+            ChatBubbleControl bubble = new ChatBubbleControl() { IsUser = false, Text = response};
+            conversation_stack_panel.Children.Insert(conversation_stack_panel.Children.Count - 1, bubble);
+
+            Conversation_ScrollViewer.ScrollToBottom();
+        }
+
+        private void Enable_Conversation()
+        {
+            input_field.IsEnabled = true;
+            input_field.Text = "Input here";
+            send_button.IsEnabled = true;
+        }
+
+        private void Disable_Conversation()
+        {
+            input_field.IsEnabled = false;
+            input_field.Text = "Please connect to the socket server";
+            send_button.IsEnabled = false;
+        }
+
+        Communicator communicator;
+
+        private void Connect_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(communicator == null)
+            {
+                try
+                {
+                    communicator = new Communicator(IP_Textbox.Text, Int32.Parse(Port_Textbox.Text));
+                    Enable_Conversation();
+                    Console_Textblock.Text = "Successfully connected to " + IP_Textbox.Text + ":" + Port_Textbox.Text;
+                    Connect_Button.Content = "Disconnect";
+                }
+                catch (Exception ex)
+                {
+                    Console_Textblock.Text = ex.Message;
+                }
+            }
+            else
+            {
+                communicator.Close();
+                communicator = null;
+                Disable_Conversation();
+                Console_Textblock.Text = "Disconnected from " + IP_Textbox.Text + ":" + Port_Textbox.Text;
+                Connect_Button.Content = "Connect";
+            }
+        }
+            
     }
 }

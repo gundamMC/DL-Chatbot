@@ -18,6 +18,30 @@ def create_embedding(glove_path):
     global embeddings
     embeddings = []
     print_message("Loading word vector")
+
+    # add special tokens
+    zeros = np.zeros((4, 54))
+
+    words_to_index["<UNK>"] = 0
+    words.append("<UNK>")
+    zeros[0, 50] = 1
+
+    words_to_index["<PAD>"] = 1
+    words.append("<PAD>")
+    zeros[1, 51] = 1
+
+    words_to_index["<EOS>"] = 2
+    global end
+    end = 2
+    words.append("<EOS>")
+    zeros[2, 52] = 1
+
+    words_to_index["<GO>"] = 3
+    global start
+    start = 3
+    words.append("<GO>")
+    zeros[3, 53] = 1
+
     f = open(glove_path, 'r', encoding='utf8')
     for index, line in enumerate(f):
         split_line = line.split(' ')
@@ -26,32 +50,13 @@ def create_embedding(glove_path):
         words.append(word)
         embedding.extend([0, 0, 0, 0])
         embeddings.append(embedding)
-        words_to_index[word] = index
+        words_to_index[word] = index + 4  # 4 special tokens
 
     embeddings = np.array(embeddings)
 
-    zeros = np.zeros((4, 29))
+    embeddings = np.vstack((zeros, embeddings))
 
-    words_to_index["<UNK>"] = len(words)
-    words.append("<UNK>")
-    zeros[0, 25] = 1
-
-    words_to_index["<PAD>"] = len(words)
-    words.append("<PAD>")
-    zeros[1, 26] = 1
-
-    words_to_index["<EOS>"] = len(words)
-    global end
-    end = len(words)
-    words.append("<EOS>")
-    zeros[2, 27] = 1
-
-    words_to_index["<GO>"] = len(words)
-    global start
-    start = len(words)
-    words.append("<GO>")
-    zeros[3, 28] = 1
-
-    embeddings = np.vstack((embeddings, zeros))
+    assert embeddings[end, 52] == 1
+    assert embeddings[start, 53] == 1
 
     print_message("Word vector loaded")

@@ -1,12 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import WordEmbedding
-import os
+import ParseData
 
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.01, batch_size=4):
+    def __init__(self, learning_rate=0.01, batch_size=16):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -15,38 +15,43 @@ class ChatbotNetwork:
         self.n_vector = WordEmbedding.embeddings.shape[1]
         self.vector_count = WordEmbedding.embeddings.shape[0]
         self.max_sequence = 50
-        self.n_hidden = 16
+        self.n_hidden = 128
 
         # Tensorflow placeholders
         self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.x_length = tf.placeholder(tf.int32, [None])
         self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.y_length = tf.placeholder(tf.int32, [None])
-        self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
+
+        with tf.device('/cpu:0'):
+            self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
 
         # Network parameters
         self.cell_encode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
         self.cell_decode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
-        self.projection_layer = tf.layers.Dense(self.vector_count)
+        self.projection_layer = tf.layers.Dense(self.vector_count, use_bias=False)
 
         # Optimization
-        self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
-            labels=tf.one_hot(self.y, self.vector_count, axis=-1), logits=self.network()))
-        self.train_op = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.cost)
+        self.mask = tf.sequence_mask(self.y_length, maxlen=50, dtype=tf.float32)
+        self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=self.mask)
+        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        self.sess = tf.Session(config=config)
+        #config = tf.ConfigProto()
+        #config.gpu_options.allow_growth = True
+        #self.sess = tf.Session(config=config)
+        self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
 
         # Word embedding
-        embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
-        self.sess.run(self.word_embedding.assign(embedding_placeholder),
-                      feed_dict={embedding_placeholder: WordEmbedding.embeddings})
+        with tf.device('/cpu:0'):
+            embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
+            self.sess.run(self.word_embedding.assign(embedding_placeholder),
+                          feed_dict={embedding_placeholder: WordEmbedding.embeddings})
 
     def network(self, mode="train"):
-        embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
+        with tf.device('/cpu:0'):
+            embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
 
         encoder_out, encoder_states = tf.nn.dynamic_rnn(
             self.cell_encode,
@@ -55,12 +60,14 @@ class ChatbotNetwork:
             sequence_length=self.x_length,
             swap_memory=True)
 
-        embedded_y = tf.nn.embedding_lookup(self.word_embedding, self.y)
-
         if mode == "train":
+
+            with tf.device('/cpu:0'):
+                embedded_y = tf.nn.embedding_lookup(self.word_embedding, self.y)
+
             helper = tf.contrib.seq2seq.TrainingHelper(
                 inputs=embedded_y,
-                sequence_length=self.y_length
+                sequence_length=tf.sign(self.y_length) * 50
             )
 
             decoder = tf.contrib.seq2seq.BasicDecoder(
@@ -70,33 +77,90 @@ class ChatbotNetwork:
                 output_layer=self.projection_layer
             )
 
-        # else:
+            outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence)
 
-            # Replicate encoder infos beam_width times
-            # decoder_initial_state = tf.contrib.seq2seq.tile_batch(
-            #     encoder_states, multiplier=3)
-            #
-            # decoder = tf.contrib.seq2seq.BeamSearchDecoder(
-            #             cell=self.cell_decode,
-            #             embedding=self.word_embedding,
-            #             start_tokens=tf.tile(WordEmbedding.start, [self.x.shape[0]]),
-            #             end_token=WordEmbedding.end,
-            #             initial_state=decoder_initial_state,
-            #             beam_width=3,
-            #             output_layer=projection_layer,
-            #             length_penalty_weight=0.0
+            return outputs.rnn_output
+
+        else:
+
+            # Beam search
+            decoder_initial_state = tf.contrib.seq2seq.tile_batch(
+                encoder_states, multiplier=3)
+
+            decoder = tf.contrib.seq2seq.BeamSearchDecoder(
+                        cell=self.cell_decode,
+                        embedding=self.word_embedding,
+                        start_tokens=tf.tile(tf.constant([WordEmbedding.start], dtype=tf.int32), [tf.shape(self.x)[0]]),
+                        end_token=WordEmbedding.end,
+                        initial_state=decoder_initial_state,
+                        beam_width=3,
+                        output_layer=self.projection_layer,
+                        length_penalty_weight=0.0
+            )
+
+            outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence)
+
+            return outputs.predicted_ids
+
+            # Greedy search
+            # Commented out to conserve vram lol xD
+            # helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
+            #     self.word_embedding,
+            #     start_tokens=tf.tile(tf.constant([WordEmbedding.start], dtype=tf.int32), [tf.shape(self.x)[0]]),
+            #     end_token=WordEmbedding.end
             # )
+            #
+            # decoder = tf.contrib.seq2seq.BasicDecoder(
+            #     self.cell_decode,
+            #     helper,
+            #     encoder_states,
+            #     output_layer=self.projection_layer
+            # )
+            #
+            # outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=False,
+            #                                                   maximum_iterations=self.max_sequence)
+            #
+            # return outputs.sample_id
 
-        outputs, _, lengths = tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=False)
-
-        logits = outputs.rnn_output
-
-        return logits
-
-    def train(self, train_x, x_length, train_y, y_length, epochs=500, display_step=50):
+    def train(self, train_x, x_length, train_y, y_length, epochs=500, display_step=10):
         for epoch in range(epochs+1):
-            mini_batches_x, mini_batches_x_length, mini_batches_y, mini_batches_y_length \
-                = self.random_mini_batches([train_x, x_length, train_y, y_length], self.batch_size)
+            if epoch % 5 == 0:
+                with tf.device('/cpu:0'):
+                    # test 1
+                    test_output = self.sess.run(self.network(mode="infer")[0],
+                                                feed_dict={
+                                                    self.x: train_x[0].reshape((1, 50)),
+                                                    self.x_length: x_length[0].reshape((1,))
+                                                })
+
+                    result = ""
+                    for i in test_output:
+                        result = result + WordEmbedding.words[i[0]] + "(" + str(i[0]) + ")" + " "
+                    print(result)
+
+                    result = ""
+                    for i in train_y[0, :y_length[0]]:
+                        result = result + WordEmbedding.words[i] + "(" + str(i) + ")" + " "
+                    print(result)
+
+                    # test 2
+                    test, test_length = ParseData.data_to_index([["how", "are", "you", "?"]], WordEmbedding.words_to_index)
+                    test_output = self.sess.run(self.network(mode="infer")[0],
+                                                feed_dict={
+                                                    self.x: np.array(test),
+                                                    self.x_length: np.array(test_length)
+                                                })
+
+                    result = ""
+                    for i in test_output:
+                        result = result + WordEmbedding.words[i[0]] + "(" + str(i[0]) + ")" + " "
+
+                    print(result)
+
+                    # end
+
+                    mini_batches_x, mini_batches_x_length, mini_batches_y, mini_batches_y_length \
+                        = self.random_mini_batches([train_x, x_length, train_y, y_length], self.batch_size)
 
             for batch in range(len(mini_batches_x)):
                 batch_x = mini_batches_x[batch]

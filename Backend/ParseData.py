@@ -3,7 +3,7 @@ import re  # regex
 
 def cornell_cleanup(sentence):
     # clean up html tags
-    sentence = re.sub(r'<.*?>', '', sentence)
+    sentence = re.sub(r'<.*?>', '', sentence.lower())
     # clean up \n and \r
     return sentence.replace('\n', '').replace('\r', '')
 
@@ -87,11 +87,19 @@ def split_data(data):
 
 def sentence_to_index(sentence, word_to_index):
     result = [word_to_index["<GO>"]]
+    length = 1
+    unks = 0
     for word in sentence:
+        length += 1
         if word in word_to_index:
             result.append(word_to_index[word])
         else:
             result.append(word_to_index["<UNK>"])
+            unks += 1
+
+    if unks > 2:
+        return None, None
+
     # max sequence length of 50
     if len(result) < 49:  # last one will always be eos
         result.append(word_to_index["<EOS>"])
@@ -99,7 +107,7 @@ def sentence_to_index(sentence, word_to_index):
     else:
         result = result[:49]
         result.append(word_to_index["<EOS>"])
-    return result, len(result)
+    return result, length + 1
 
 
 def data_to_index(data, word_to_index):
@@ -107,6 +115,8 @@ def data_to_index(data, word_to_index):
     lengths = []
     for line in data:
         tmp, tmp_length = sentence_to_index(line, word_to_index)
+        if tmp is None:
+            continue
         result.append(tmp)
         lengths.append(tmp_length)
     return result, lengths

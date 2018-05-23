@@ -393,3 +393,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+Backend/Data/movie_lines.txt
+Backend/Data/glove.6B.50d.txt
+Backend/Data/movie_conversations.txt

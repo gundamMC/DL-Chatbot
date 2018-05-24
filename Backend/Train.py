@@ -2,9 +2,9 @@ import ParseData
 import WordEmbedding
 from Network import ChatbotNetwork
 import numpy as np
+import os
 
 # Force Tensorflow to use CPU
-# import os
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 question, response = ParseData.load_cornell(".\\Data\\movie_conversations.txt", ".\\Data\\movie_lines.txt")
@@ -16,12 +16,16 @@ WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt")
 question_index, question_length = ParseData.data_to_index(question, WordEmbedding.words_to_index)
 response_index, response_length = ParseData.data_to_index(response, WordEmbedding.words_to_index)
 
-question_index = np.array(question_index[:256])
-question_length = np.array(question_length[:256])
-response_index = np.array(response_index[:256])
-response_length = np.array(response_length[:256])
+question_index = np.array(question_index[1024:4096])
+question_length = np.array(question_length[1024:4096])
+response_index = np.array(response_index[1024:4096])
+response_length = np.array(response_length[1024:4096])
 
-network = ChatbotNetwork()
+if os.path.isfile("./model/checkpoint") and \
+        input("Create new network or restore from model? (type 'restore' to restore, else create new): ") == "restore":
+    network = ChatbotNetwork(restore=True)
+else:
+    network = ChatbotNetwork()
 
 while True:
     user_input = input("Train epochs: ")
@@ -30,6 +34,7 @@ while True:
 
     if user_input == "save":
         network.save()
+        continue
 
     try:
         epochs = int(user_input)

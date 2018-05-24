@@ -97,12 +97,12 @@ def sentence_to_index(sentence, word_to_index):
             result.append(word_to_index["<UNK>"])
             unks += 1
 
-    # max sequence length of 50
-    if len(result) < 49:  # last one will always be eos
+    # max sequence length of 25
+    if len(result) < 24:  # last one will always be eos
         result.append(word_to_index["<EOS>"])
-        result.extend([word_to_index["<PAD>"]] * (50 - len(result)))
+        result.extend([word_to_index["<PAD>"]] * (25 - len(result)))
     else:
-        result = result[:49]
+        result = result[:24]
         result.append(word_to_index["<EOS>"])
     return result, length + 1
 

@@ -6,15 +6,15 @@ import ParseData
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.001, batch_size=16, restore=False):
+    def __init__(self, learning_rate=0.0005, batch_size=32, restore=False):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
 
         # Network hyperparameters
-        self.n_vector = WordEmbedding.embeddings.shape[1]
-        self.vector_count = WordEmbedding.embeddings.shape[0]
-        self.max_sequence = 50
+        self.n_vector = 54
+        self.vector_count = len(WordEmbedding.words)
+        self.max_sequence = 25
         self.n_hidden = 64
 
         # Tensorflow placeholders
@@ -23,15 +23,16 @@ class ChatbotNetwork:
         self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
         self.y_length = tf.placeholder(tf.int32, [None])
         with tf.device('/cpu:0'):
-            self.word_embedding = tf.Variable(tf.constant(0.0, shape=WordEmbedding.embeddings.shape), trainable=False)
+            self.word_embedding = tf.Variable(tf.constant(0.0, shape=(self.vector_count, self.n_vector)), trainable=False)
 
         # Network parameters
-        self.cell_encode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_encode_fw = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_encode_bw = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
         self.cell_decode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
         self.projection_layer = tf.layers.Dense(self.vector_count, use_bias=False)
 
         # Optimization
-        self.mask = tf.sequence_mask(self.y_length, maxlen=50, dtype=tf.float32)
+        self.mask = tf.sequence_mask(self.y_length, maxlen=self.max_sequence, dtype=tf.float32)
         self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=self.mask)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
@@ -43,9 +44,9 @@ class ChatbotNetwork:
         self.saver = tf.train.Saver()
 
         if restore:
-            self.saver.restore(self.sess, "./")
+            self.saver.restore(self.sess, './model/model.ckpt')
         else:
-            # Word embedding
+            # get new word embedding
             with tf.device('/cpu:0'):
                 embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
                 self.sess.run(self.word_embedding.assign(embedding_placeholder),
@@ -55,12 +56,15 @@ class ChatbotNetwork:
         with tf.device('/cpu:0'):
             embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
 
-        encoder_out, encoder_states = tf.nn.dynamic_rnn(
-            self.cell_encode,
+        encoder_out, encoder_states = tf.nn.bidirectional_dynamic_rnn(
+            self.cell_encode_fw,
+            self.cell_encode_bw,
             inputs=embedded_x,
             dtype=tf.float32,
             sequence_length=self.x_length,
             swap_memory=True)
+
+        encoder_states = encoder_states[1]
 
         if mode == "train":
 
@@ -69,7 +73,7 @@ class ChatbotNetwork:
 
             helper = tf.contrib.seq2seq.TrainingHelper(
                 inputs=embedded_y,
-                sequence_length=tf.sign(self.y_length) * 50
+                sequence_length=tf.sign(self.y_length) * self.max_sequence
             )
 
             decoder = tf.contrib.seq2seq.BasicDecoder(
@@ -79,7 +83,7 @@ class ChatbotNetwork:
                 output_layer=self.projection_layer
             )
 
-            outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence)
+            outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence, swap_memory=True)
 
             return outputs.rnn_output
 
@@ -97,41 +101,21 @@ class ChatbotNetwork:
                         initial_state=decoder_initial_state,
                         beam_width=3,
                         output_layer=self.projection_layer,
-                        length_penalty_weight=0.0
+                        length_penalty_weight=1.0
             )
 
             outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence)
 
             return outputs.predicted_ids
 
-            # Greedy search
-            # Commented out to conserve vram lol xD
-            # helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
-            #     self.word_embedding,
-            #     start_tokens=tf.tile(tf.constant([WordEmbedding.start], dtype=tf.int32), [tf.shape(self.x)[0]]),
-            #     end_token=WordEmbedding.end
-            # )
-            #
-            # decoder = tf.contrib.seq2seq.BasicDecoder(
-            #     self.cell_decode,
-            #     helper,
-            #     encoder_states,
-            #     output_layer=self.projection_layer
-            # )
-            #
-            # outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, impute_finished=False,
-            #                                                   maximum_iterations=self.max_sequence)
-            #
-            # return outputs.sample_id
-
     def train(self, train_x, x_length, train_y, y_length, epochs=500, display_step=10):
         for epoch in range(epochs+1):
-            if epoch % 5 == 0:
+            if epoch % 10 == 0:
                 with tf.device('/cpu:0'):
                     # test 1
                     test_output = self.sess.run(self.network(mode="infer")[0],
                                                 feed_dict={
-                                                    self.x: train_x[0].reshape((1, 50)),
+                                                    self.x: train_x[0].reshape((1, self.max_sequence)),
                                                     self.x_length: x_length[0].reshape((1,))
                                                 })
 
@@ -201,14 +185,11 @@ class ChatbotNetwork:
                                     })
         result = ""
         for i in test_output:
-            if len(i) == 3:
-                result = result + WordEmbedding.words[round(i[0])] + " "
-            else:
-                break
+            result = result + WordEmbedding.words[round(i[0])] + " "
         return result
 
     def save(self):
-        self.saver.save(self.sess, 'model')
+        self.saver.save(self.sess, './model/model.ckpt')
 
     @staticmethod
     def random_mini_batches(data_lists, mini_batch_size):

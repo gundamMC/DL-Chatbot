@@ -49,10 +49,10 @@ def create_embedding(glove_path, save_embedding=True):
     if save_embedding:
         # add special tokens
         zeros = np.zeros((4, 54))
-        zeros[0, 50] = 1
+        zeros[0] = np.random.rand(1, 54)
         zeros[1, 51] = 1
-        zeros[2, 52] = 1
-        zeros[3, 53] = 1
+        zeros[2, 52] = 0
+        zeros[3] = np.ones((1, 54))
 
         embeddings = np.array(embeddings)
         embeddings = np.vstack((zeros, embeddings))

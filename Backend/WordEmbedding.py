@@ -41,18 +41,18 @@ def create_embedding(glove_path, save_embedding=True):
         word = split_line[0]
         if save_embedding:
             embedding = [float(val) for val in split_line[1:]]
-            embedding.extend([0, 0, 0, 0])
+            # embedding.extend([0, 0, 0, 0])
             embeddings.append(embedding)
         words.append(word)
         words_to_index[word] = index + 4  # 4 special tokens
 
     if save_embedding:
         # add special tokens
-        zeros = np.zeros((4, 54))
-        zeros[0] = np.random.rand(1, 54)
-        zeros[1, 51] = 1
-        zeros[2, 52] = 0
-        zeros[3] = np.ones((1, 54))
+        zeros = np.zeros((4, 50))
+        zeros[0] = np.random.rand(1, 50)
+        # zeros[1, 51] = 1
+        # zeros[2, 52] = 0
+        zeros[3] = np.ones((1, 50))
 
         embeddings = np.array(embeddings)
         embeddings = np.vstack((zeros, embeddings))

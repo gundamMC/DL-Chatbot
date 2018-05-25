@@ -86,8 +86,9 @@ def split_data(data):
 
 
 def sentence_to_index(sentence, word_to_index):
-    result = [word_to_index["<GO>"]]
-    length = 1
+    # result = [word_to_index["<GO>"]]
+    result = []
+    length = 0
     unks = 0
     for word in sentence:
         length += 1
@@ -104,6 +105,7 @@ def sentence_to_index(sentence, word_to_index):
     else:
         result = result[:24]
         result.append(word_to_index["<EOS>"])
+        length = 24
     return result, length + 1
 
 

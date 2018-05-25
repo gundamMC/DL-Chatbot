@@ -6,13 +6,13 @@ import ParseData
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.0005, batch_size=32, restore=False):
+    def __init__(self, learning_rate=0.00005, batch_size=32, restore=False):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
 
         # Network hyperparameters
-        self.n_vector = 54
+        self.n_vector = 50
         self.vector_count = len(WordEmbedding.words)
         self.max_sequence = 25
         self.n_hidden = 64
@@ -32,8 +32,8 @@ class ChatbotNetwork:
         self.projection_layer = tf.layers.Dense(self.vector_count, use_bias=False)
 
         # Optimization
-        self.mask = tf.sequence_mask(self.y_length, maxlen=self.max_sequence, dtype=tf.float32)
-        self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=self.mask)
+        mask = tf.sequence_mask(self.y_length, maxlen=self.max_sequence, dtype=tf.float32)
+        self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=mask)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
@@ -64,7 +64,7 @@ class ChatbotNetwork:
             sequence_length=self.x_length,
             swap_memory=True)
 
-        encoder_states = encoder_states[1]
+        encoder_states = encoder_states[-1]
 
         if mode == "train":
 
@@ -96,7 +96,7 @@ class ChatbotNetwork:
             decoder = tf.contrib.seq2seq.BeamSearchDecoder(
                         cell=self.cell_decode,
                         embedding=self.word_embedding,
-                        start_tokens=tf.tile(tf.constant([WordEmbedding.start], dtype=tf.int32), [tf.shape(self.x)[0]]),
+                        start_tokens=tf.tile(tf.constant([WordEmbedding.words_to_index["<PAD>"]], dtype=tf.int32), [tf.shape(self.x)[0]]),
                         end_token=WordEmbedding.end,
                         initial_state=decoder_initial_state,
                         beam_width=3,

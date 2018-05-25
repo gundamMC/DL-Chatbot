@@ -72,8 +72,9 @@
                     <ScrollViewer x:Name="Conversation_ScrollViewer" HorizontalAlignment="Left" Height="550" Margin="0" VerticalAlignment="Top" Width="1125">
                         <StackPanel x:Name="conversation_stack_panel" HorizontalAlignment="Center" Width="1030" Margin="0">
                             <Label Height="40"/>
-                            <local:ChatBubbleControl Text="Hello" IsUser="True"/>
-                            <local:ChatBubbleControl Text="Hi" IsUser="False"/>
+                            <local:ChatBubbleControl Text="Hello there!" IsUser="False"/>
+                            <Label Height="20"/>
+                            <local:ChatBubbleControl Text="To start the chat, click the second icon on the left and connect to the backend." IsUser="False"/>
                             <Label Height="40"/>
                         </StackPanel>
                     </ScrollViewer>

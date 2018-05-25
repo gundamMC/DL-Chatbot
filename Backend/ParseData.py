@@ -89,17 +89,16 @@ def sentence_to_index(sentence, word_to_index):
     # result = [word_to_index["<GO>"]]
     result = []
     length = 0
-    unks = 0
     for word in sentence:
         length += 1
         if word in word_to_index:
             result.append(word_to_index[word])
         else:
             result.append(word_to_index["<UNK>"])
-            unks += 1
 
     # max sequence length of 25
     if len(result) < 24:  # last one will always be eos
+        # TODO: maybe try removing eos?
         result.append(word_to_index["<EOS>"])
         result.extend([word_to_index["<PAD>"]] * (25 - len(result)))
     else:

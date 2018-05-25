@@ -33,7 +33,10 @@ class ChatbotNetwork:
 
         # Optimization
         mask = tf.sequence_mask(self.y_length, maxlen=self.max_sequence, dtype=tf.float32)
-        self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=mask)
+        # self.cost = tf.contrib.seq2seq.sequence_loss(logits=self.network(), targets=self.y, weights=mask)
+        crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(
+            labels=self.y, logits=self.network())
+        self.cost = (tf.reduce_sum(crossent * mask) / batch_size)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
@@ -73,7 +76,7 @@ class ChatbotNetwork:
 
             helper = tf.contrib.seq2seq.TrainingHelper(
                 inputs=embedded_y,
-                sequence_length=tf.sign(self.y_length) * self.max_sequence
+                sequence_length=self.y_length
             )
 
             decoder = tf.contrib.seq2seq.BasicDecoder(

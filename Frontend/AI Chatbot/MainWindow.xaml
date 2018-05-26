@@ -75,6 +75,8 @@
                             <local:ChatBubbleControl Text="Hello there!" IsUser="False"/>
                             <Label Height="20"/>
                             <local:ChatBubbleControl Text="To start the chat, click the second icon on the left and connect to the backend." IsUser="False"/>
+                            <Label Height="20"/>
+                            <local:ChatBubbleControl Text="Please send your messages in the format of &quot;[start token]; [sentence]&quot;, where the start token (the first word of the response provided by you) and your sentence is separated by a semicolon and a space. If you do not want to provide one, only input your sentence and ignore everything above." IsUser="False"/>
                             <Label Height="40"/>
                         </StackPanel>
                     </ScrollViewer>

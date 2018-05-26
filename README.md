@@ -1,6 +1,8 @@
 # AI-Chatbot
 A demo deep learning chatbot using Tensorflow with a C# WPF GUI.
 
+Note: Pretrained models **are** not provided. Please train your own network.
+
 ## Usage
 ### Socket
 To use the python backend, run socket.py and connect to the socket on `localhost:8089`.

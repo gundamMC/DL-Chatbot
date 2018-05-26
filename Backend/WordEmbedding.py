@@ -25,14 +25,9 @@ def create_embedding(glove_path, save_embedding=True):
     words_to_index["<PAD>"] = 1
     words.append("<PAD>")
 
-    words_to_index["<EOS>"] = 2
-    global end
-    end = 2
-    words.append("<EOS>")
-
-    words_to_index["<GO>"] = 3
+    words_to_index["<GO>"] = 2
     global start
-    start = 3
+    start = 2
     words.append("<GO>")
 
     f = open(glove_path, 'r', encoding='utf8')
@@ -44,17 +39,23 @@ def create_embedding(glove_path, save_embedding=True):
             # embedding.extend([0, 0, 0, 0])
             embeddings.append(embedding)
         words.append(word)
-        words_to_index[word] = index + 4  # 4 special tokens
+        words_to_index[word] = index + 3  # 4 special tokens
+
+    words_to_index["<EOS>"] = len(words)
+    global end
+    end = len(words)
+    words.append("<EOS>")
 
     if save_embedding:
         # add special tokens
-        zeros = np.zeros((4, 50))
-        zeros[0] = np.random.rand(1, 50)
+        zeros = np.random.rand(3, 50)
+        # zeros = np.zeros((4, 50))
+        # zeros[0] = np.random.rand(1, 50)
         # zeros[1, 51] = 1
         # zeros[2, 52] = 0
-        zeros[3] = np.ones((1, 50))
+        # zeros[3] = np.ones((1, 50))
 
         embeddings = np.array(embeddings)
-        embeddings = np.vstack((zeros, embeddings))
+        embeddings = np.vstack((zeros, embeddings, np.random.rand(1, 50)))
 
     print("Word vector loaded")

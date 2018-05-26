@@ -22,14 +22,20 @@ WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt", save_embedding=new)
 question_index, question_length = ParseData.data_to_index(question, WordEmbedding.words_to_index)
 response_index, response_length = ParseData.data_to_index(response, WordEmbedding.words_to_index)
 
-question_index = np.array(question_index[:2048])
-question_length = np.array(question_length[:2048])
-response_index = np.array(response_index[:2048])
-response_length = np.array(response_length[:2048])
+question_index = np.array(question_index[128:1024])
+question_length = np.array(question_length[128:1024])
+response_index = np.array(response_index[128:1024])
+response_length = np.array(response_length[128:1024])
 
+print(response_index[0])
+
+print(response_index.shape)
 
 network = ChatbotNetwork(restore=not new)
 
+if new:
+    # Free memory
+    WordEmbedding.embeddings = None
 
 while True:
     user_input = input("Train epochs: ")
@@ -47,4 +53,4 @@ while True:
         continue
 
     network.train(question_index, question_length, response_index, response_length,
-                  epochs=epochs, display_step=epochs/10)
+                  epochs=epochs, display_step=int(epochs/10))

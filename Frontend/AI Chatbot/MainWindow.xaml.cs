@@ -124,7 +124,7 @@ namespace AI_Chatbot
 
         private void Send(String message)
         {
-            String response = communicator.SendMessage("input: " + message);
+            String response = communicator.SendMessage(message);
             ChatBubbleControl bubble = new ChatBubbleControl() { IsUser = false, Text = response};
             conversation_stack_panel.Children.Insert(conversation_stack_panel.Children.Count - 1, bubble);
 

@@ -10,6 +10,7 @@ from itertools import groupby
 WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt", save_embedding=False)
 network = ChatbotNetwork(restore=True)
 
+print("Network loaded")
 
 s = socket.socket()
 host = "localhost"

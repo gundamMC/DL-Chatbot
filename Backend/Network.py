@@ -12,7 +12,7 @@ import ParseData
 
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.005, batch_size=32, restore=False):
+    def __init__(self, learning_rate=0.001, batch_size=32, restore=False):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -21,7 +21,7 @@ class ChatbotNetwork:
         self.n_vector = 50
         self.vector_count = len(WordEmbedding.words)
         self.max_sequence = 20
-        self.n_hidden = 128
+        self.n_hidden = 2560
 
         # Tensorflow placeholders
         with tf.device('/GPU:1'):
@@ -41,10 +41,10 @@ class ChatbotNetwork:
 
         # Optimization
         with tf.device('/GPU:1'):
-            mask = tf.sequence_mask(self.y_length, maxlen=self.max_sequence, dtype=tf.float32)
-        with tf.device('/GPU:1'):
+            dynamic_max_sequence = tf.reduce_max(self.y_length)
+            mask = tf.sequence_mask(self.y_length, maxlen=dynamic_max_sequence, dtype=tf.float32)
             crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-                labels=self.y, logits=self.network())
+                labels=self.y[:, :dynamic_max_sequence], logits=self.network())
             self.cost = (tf.reduce_sum(crossent * mask) / batch_size)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
@@ -76,8 +76,6 @@ class ChatbotNetwork:
                 sequence_length=self.x_length,
                 swap_memory=True)
 
-            encoder_states = encoder_states[-1]
-
         if mode == "train":
 
             with tf.device('/GPU:1'):
@@ -92,7 +90,7 @@ class ChatbotNetwork:
                 decoder = tf.contrib.seq2seq.BasicDecoder(
                     self.cell_decode,
                     helper,
-                    encoder_states,
+                    encoder_states[-1],
                     output_layer=self.projection_layer
                 )
 
@@ -104,15 +102,15 @@ class ChatbotNetwork:
             with tf.device('/GPU:1'):
                 # Beam search
                 decoder_initial_state = tf.contrib.seq2seq.tile_batch(
-                    encoder_states, multiplier=3)
+                    encoder_states[-1], multiplier=5)
 
                 decoder = tf.contrib.seq2seq.BeamSearchDecoder(
                             cell=self.cell_decode,
                             embedding=self.word_embedding,
                             start_tokens=tf.tile(tf.constant([WordEmbedding.words_to_index[start_token]], dtype=tf.int32), [tf.shape(self.x)[0]]),
-                            end_token=WordEmbedding.words_to_index["<GO>"],
+                            end_token=WordEmbedding.words_to_index["<EOS>"],
                             initial_state=decoder_initial_state,
-                            beam_width=3,
+                            beam_width=5,
                             output_layer=self.projection_layer,
                             length_penalty_weight=1.0
                 )
@@ -121,24 +119,42 @@ class ChatbotNetwork:
 
                 return outputs.predicted_ids
 
+                # Greedy search
+                # helper = tf.contrib.seq2seq.GreedyEmbeddingHelper(
+                #     embedding=self.word_embedding,
+                #     start_tokens=tf.tile(tf.constant([WordEmbedding.words_to_index[start_token]], dtype=tf.int32), [tf.shape(self.x)[0]]),
+                #     end_token=WordEmbedding.words_to_index["<EOS>"]
+                # )
+                #
+                # decoder = tf.contrib.seq2seq.BasicDecoder(
+                #     self.cell_decode,
+                #     helper,
+                #     encoder_states,
+                #     output_layer=self.projection_layer
+                # )
+                #
+                # outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence,
+                #                                                   swap_memory=True)
+                #
+                # return outputs.sample_id
+
     def train(self, train_x, x_length, train_y, y_length, epochs=500, display_step=10):
-        for epoch in range(epochs+1):
+
+        for epoch in range(epochs):
             if epoch % 10 == 0:
                 # test 1
-                test_output = self.sess.run(self.network(mode="infer", start_token="well")[0],
+                test_output = self.sess.run(self.network(mode="infer")[0],
                                             feed_dict={
                                                 self.x: train_x[0].reshape((1, self.max_sequence)),
                                                 self.x_length: x_length[0].reshape((1,))
                                             })
 
-                result = ""
-                for i in test_output:
-                    if len(i) == 3:
-                        result = result + WordEmbedding.words[round(i[0])] + "(" + str(i[0]) + ")" + " "
-                    else:
-                        break
+                for beam in range(5):
+                    result = ""
+                    for i in test_output:
+                        result = result + WordEmbedding.words[i[beam]] + "(" + str(i[beam]) + ")" + " "
 
-                print(result)
+                    print(result)
 
                 result = ""
                 for i in train_y[0, :y_length[0]]:
@@ -146,21 +162,21 @@ class ChatbotNetwork:
                 print(result)
 
                 # test 2
-                test, test_length = ParseData.data_to_index([["how", "are", "you", "?"]],
-                                                            WordEmbedding.words_to_index)
-                test_output = self.sess.run(self.network(mode="infer", start_token="i")[0],
+                test, test_length, _ = ParseData.sentence_to_index(["how", "are", "you", "?"], WordEmbedding.words_to_index)
+                test = [test]
+                test_length = [test_length]
+                test_output = self.sess.run(self.network(mode="infer")[0],
                                             feed_dict={
                                                 self.x: np.array(test),
                                                 self.x_length: np.array(test_length)
                                             })
 
-                result = ""
-                for i in test_output:
-                    if len(i) == 3:
-                        result = result + WordEmbedding.words[round(i[0])] + "(" + str(i[0]) + ")" + " "
-                    else:
-                        break
-                print(result)
+                for beam in range(5):
+                    result = ""
+                    for i in test_output:
+                        result = result + WordEmbedding.words[i[beam]] + "(" + str(i[beam]) + ")" + " "
+
+                    print(result)
 
                 # end
 

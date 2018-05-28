@@ -86,15 +86,16 @@ def split_data(data):
 
 
 def sentence_to_index(sentence, word_to_index):
-    # result = [word_to_index["<GO>"]]
-    result = []
-    length = 0
+    result = [word_to_index["<GO>"]]
+    length = 1
+    unk = 0
     for word in sentence:
         length += 1
         if word in word_to_index:
             result.append(word_to_index[word])
         else:
             result.append(word_to_index["<UNK>"])
+            unk += 1
 
     # max sequence length of 20
     if length < 20:
@@ -108,16 +109,28 @@ def sentence_to_index(sentence, word_to_index):
         result = result[:20]
         length = 20
 
-    return result, length
+    return result, length, unk
 
 
-def data_to_index(data, word_to_index):
-    result = []
-    lengths = []
-    for line in data:
-        tmp, tmp_length = sentence_to_index(line, word_to_index)
-        if tmp is None:
+def data_to_index(data_x, data_y, word_to_index):
+    result_x = []
+    result_y = []
+    lengths_x = []
+    lengths_y = []
+    index = 0
+
+    while index < len(data_x):
+        x, x_length, x_unk = sentence_to_index(data_x[index], word_to_index)
+        y, y_length, y_unk = sentence_to_index(data_y[index], word_to_index)
+
+        index += 1
+
+        if x_unk > 1 or y_unk > 0:
             continue
-        result.append(tmp)
-        lengths.append(tmp_length)
-    return result, lengths
+
+        result_x.append(x)
+        result_y.append(y)
+        lengths_x.append(x_length)
+        lengths_y.append(y_length)
+
+    return result_x, result_y, lengths_x, lengths_y

@@ -54,10 +54,10 @@
         <Rectangle x:Name="Title_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="50" Stroke="Black" VerticalAlignment="Top" Width="1080" MouseDown="Title_Bar_MouseDown" StrokeThickness="0" Margin="0"/>
         <Rectangle x:Name="Side_Bar" Fill="#2f3437" HorizontalAlignment="Left" Height="540" Stroke="Black" VerticalAlignment="Top" Width="70" Opacity="0.4" Margin="0,260,0,0" StrokeThickness="0"/>
         <Label Content="AI Chatbot Demo" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="Microsoft YaHei" FontSize="14" Height="50" VerticalContentAlignment="Center"/>
-        <Button HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
+        <Button x:Name="Min_Button" HorizontalAlignment="Left" Margin="1080,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C" Click="Min_Button_Click">
             <Image Width="16" Source="pack://application:,,,/Resources/Minimize.png"/>
         </Button>
-        <Button HorizontalAlignment="Left" Margin="1140,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C">
+        <Button x:Name="Close_Button" HorizontalAlignment="Left" Margin="1140,0,0,0" VerticalAlignment="Top" Width="60" Height="50" Background="#2f3437" BorderThickness="0" BorderBrush="#FF282B2C" Click="Close_Button_Click">
             <Image Width="16" Source="pack://application:,,,/Resources/Close.png"/>
         </Button>
 

@@ -31,7 +31,12 @@ def create_embedding(glove_path, save_embedding=True):
     words.append("<GO>")
 
     f = open(glove_path, 'r', encoding='utf8')
-    for index, line in enumerate(f):
+    index = 3
+    for line in f:
+
+        if index > 25000:
+            break
+
         split_line = line.split(' ')
         word = split_line[0]
         if save_embedding:
@@ -39,7 +44,8 @@ def create_embedding(glove_path, save_embedding=True):
             # embedding.extend([0, 0, 0, 0])
             embeddings.append(embedding)
         words.append(word)
-        words_to_index[word] = index + 3  # 4 special tokens
+        words_to_index[word] = index  # 3 special tokens before
+        index += 1
 
     words_to_index["<EOS>"] = len(words)
     global end

@@ -172,6 +172,15 @@ namespace AI_Chatbot
                 Connect_Button.Content = "Connect";
             }
         }
-            
+
+        private void Min_Button_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void Close_Button_Click(object sender, RoutedEventArgs e)
+        {
+            App.Current.Shutdown();
+        }
     }
 }

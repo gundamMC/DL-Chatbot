@@ -19,20 +19,18 @@ if os.path.isfile("./model/checkpoint") and \
 
 WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt", save_embedding=new)
 
-question_index, question_length = ParseData.data_to_index(question, WordEmbedding.words_to_index)
-response_index, response_length = ParseData.data_to_index(response, WordEmbedding.words_to_index)
+start_index = 0
+end_index = start_index + 65536
 
-question_index = np.array(question_index[128:1024])
-question_length = np.array(question_length[128:1024])
-response_index = np.array(response_index[128:1024])
-response_length = np.array(response_length[128:1024])
+question_index, response_index, question_length, response_length = \
+    ParseData.data_to_index(question[start_index:end_index], response[start_index:end_index], WordEmbedding.words_to_index)
 
-print(response_index[0])
-
-print(response_index.shape)
+question_index = np.array(question_index)
+question_length = np.array(question_length)
+response_index = np.array(response_index)
+response_length = np.array(response_length)
 
 network = ChatbotNetwork(restore=not new)
-
 if new:
     # Free memory
     WordEmbedding.embeddings = None
@@ -45,6 +43,13 @@ while True:
     if user_input == "save":
         network.save()
         continue
+
+    if user_input == "continue":
+        while True:
+            network.train(question_index, question_length, response_index, response_length,
+                          epochs=49, display_step=50)
+            network.save()
+            print("Done")
 
     try:
         epochs = int(user_input)

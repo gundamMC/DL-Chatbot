@@ -4,15 +4,9 @@ import WordEmbedding
 import ParseData
 
 
-# This network is optimized for TWO graphics cards
-# More specifically, a GTX 1060 6G as GPU:0 and a a GTX 1060 3G as GPU:1
-# If you want to use it with other configurations,
-# please change "with tf.device..."
-
-
 class ChatbotNetwork:
 
-    def __init__(self, learning_rate=0.001, batch_size=32, restore=False):
+    def __init__(self, learning_rate=0.0002, batch_size=32, restore=False):
         # hyperparameters
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -21,35 +15,35 @@ class ChatbotNetwork:
         self.n_vector = 50
         self.vector_count = len(WordEmbedding.words)
         self.max_sequence = 20
-        self.n_hidden = 2560
+        self.n_hidden = 512
 
         # Tensorflow placeholders
-        with tf.device('/GPU:1'):
-            self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
-            self.x_length = tf.placeholder(tf.int32, [None])
-            self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
-            self.y_length = tf.placeholder(tf.int32, [None])
-            self.word_embedding = tf.Variable(tf.constant(0.0, shape=(self.vector_count, self.n_vector)), trainable=False)
+        self.x = tf.placeholder(tf.int32, [None, self.max_sequence])
+        self.x_length = tf.placeholder(tf.int32, [None])
+        self.y = tf.placeholder(tf.int32, [None, self.max_sequence])
+        self.y_length = tf.placeholder(tf.int32, [None])
+        self.word_embedding = tf.Variable(tf.constant(0.0, shape=(self.vector_count, self.n_vector)), trainable=False)
 
         # Network parameters
-        with tf.device('/GPU:1'):
-            self.cell_encode_fw = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
-            self.cell_encode_bw = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
-        with tf.device('/GPU:0'):
-            self.cell_decode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
-            self.projection_layer = tf.layers.Dense(self.vector_count, use_bias=False)
+        self.cell_encode_fw_0 = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_encode_bw_0 = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_encode_fw_1 = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_encode_bw_1 = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.cell_decode = tf.contrib.rnn.BasicLSTMCell(self.n_hidden)
+        self.projection_layer = tf.layers.Dense(self.vector_count, use_bias=False)
 
         # Optimization
-        with tf.device('/GPU:1'):
-            dynamic_max_sequence = tf.reduce_max(self.y_length)
-            mask = tf.sequence_mask(self.y_length, maxlen=dynamic_max_sequence, dtype=tf.float32)
-            crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-                labels=self.y[:, :dynamic_max_sequence], logits=self.network())
-            self.cost = (tf.reduce_sum(crossent * mask) / batch_size)
+        dynamic_max_sequence = tf.reduce_max(self.y_length)
+        mask = tf.sequence_mask(self.y_length, maxlen=dynamic_max_sequence, dtype=tf.float32)
+        crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(
+            labels=self.y[:, :dynamic_max_sequence], logits=self.network())
+        self.cost = (tf.reduce_sum(crossent * mask) / batch_size)
         self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.cost)
 
         # Tensorflow initialization
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        self.sess = tf.Session(config=config)
         self.sess.run(tf.global_variables_initializer())
 
         # Saver object which will save/restore all the variables
@@ -59,50 +53,48 @@ class ChatbotNetwork:
             self.saver.restore(self.sess, './model/model.ckpt')
         else:
             # get new word embedding
-            with tf.device('/GPU:1'):
+            with tf.device('/CPU:0'):
                 embedding_placeholder = tf.placeholder(tf.float32, shape=WordEmbedding.embeddings.shape)
                 self.sess.run(self.word_embedding.assign(embedding_placeholder),
                               feed_dict={embedding_placeholder: WordEmbedding.embeddings})
 
     def network(self, mode="train", start_token="<GO>"):
-        with tf.device('/GPU:1'):
+        with tf.device('/CPU:0'):
             embedded_x = tf.nn.embedding_lookup(self.word_embedding, self.x)
 
-            encoder_out, encoder_states = tf.nn.bidirectional_dynamic_rnn(
-                self.cell_encode_fw,
-                self.cell_encode_bw,
-                inputs=embedded_x,
-                dtype=tf.float32,
-                sequence_length=self.x_length,
-                swap_memory=True)
+        _, _, encoder_state_bw = tf.contrib.rnn.stack_bidirectional_dynamic_rnn(
+            [self.cell_encode_fw_0, self.cell_encode_fw_1],
+            [self.cell_encode_bw_0, self.cell_encode_bw_1],
+            inputs=embedded_x,
+            dtype=tf.float32,
+            sequence_length=self.x_length)
 
         if mode == "train":
 
-            with tf.device('/GPU:1'):
+            with tf.device('/CPU:0'):
                 embedded_y = tf.nn.embedding_lookup(self.word_embedding, self.y)
 
-            with tf.device('/GPU:0'):
-                helper = tf.contrib.seq2seq.TrainingHelper(
-                    inputs=embedded_y,
-                    sequence_length=self.y_length
-                )
+            helper = tf.contrib.seq2seq.TrainingHelper(
+                inputs=embedded_y,
+                sequence_length=self.y_length
+            )
 
-                decoder = tf.contrib.seq2seq.BasicDecoder(
-                    self.cell_decode,
-                    helper,
-                    encoder_states[-1],
-                    output_layer=self.projection_layer
-                )
+            decoder = tf.contrib.seq2seq.BasicDecoder(
+                self.cell_decode,
+                helper,
+                encoder_state_bw[-1],
+                output_layer=self.projection_layer
+            )
 
-                outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence, swap_memory=True)
+            outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder, maximum_iterations=self.max_sequence, swap_memory=True)
 
-                return outputs.rnn_output
+            return outputs.rnn_output
 
         else:
-            with tf.device('/GPU:1'):
+            with tf.device('/CPU:0'):
                 # Beam search
                 decoder_initial_state = tf.contrib.seq2seq.tile_batch(
-                    encoder_states[-1], multiplier=5)
+                    encoder_state_bw[-1], multiplier=5)
 
                 decoder = tf.contrib.seq2seq.BeamSearchDecoder(
                             cell=self.cell_decode,

@@ -99,9 +99,9 @@ def sentence_to_index(sentence, word_to_index):
 
     # max sequence length of 20
     if length < 20:
-        result.append(word_to_index["<EOS>"])
-        length += 1
-        result.extend([word_to_index["<PAD>"]] * (20 - length))
+        # result.append(word_to_index["<EOS>"])
+        # length += 1
+        result.extend([word_to_index["<EOS>"]] * (20 - length))
     else:
         # result = result[:19]
         # result.append(word_to_index["<EOS>"])

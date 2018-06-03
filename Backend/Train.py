@@ -17,10 +17,10 @@ if os.path.isfile("./model/checkpoint") and \
         input("Create new network or restore from model? (type 'restore' to restore, else create new): ") == "restore":
     new = False
 
-WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt", save_embedding=new)
+WordEmbedding.create_embedding(".\\Data\\glove.twitter.27B.100d.txt", save_embedding=new)
 
 start_index = 0
-end_index = start_index + 1024
+end_index = start_index + 81960
 
 question_index, response_index, question_length, response_length = \
     ParseData.data_to_index(question[start_index:end_index], response[start_index:end_index], WordEmbedding.words_to_index)
@@ -46,10 +46,15 @@ while True:
 
     if user_input == "continue":
         while True:
-            network.train(question_index, question_length, response_index, response_length,
-                          epochs=49, display_step=50)
+            network.train(question_index, question_length, response_index, response_length, epochs=2)
             network.save()
             print("Done")
+
+    if user_input.startswith('predict'):
+        input_x, x_length, _ = ParseData.sentence_to_index(ParseData.split_sentence(user_input.replace("predict ", "", 1)), WordEmbedding.words_to_index)
+        result = network.predict([input_x], [x_length])
+        print(result)
+        continue
 
     try:
         epochs = int(user_input)

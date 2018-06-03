@@ -22,19 +22,21 @@ def create_embedding(glove_path, save_embedding=True):
     words_to_index["<UNK>"] = 0
     words.append("<UNK>")
 
-    words_to_index["<PAD>"] = 1
-    words.append("<PAD>")
-
-    words_to_index["<GO>"] = 2
+    words_to_index["<GO>"] = 1
     global start
-    start = 2
+    start = 1
     words.append("<GO>")
+
+    words_to_index["<EOS>"] = 2
+    global end
+    end = 2
+    words.append("<EOS>")
 
     f = open(glove_path, 'r', encoding='utf8')
     index = 3
     for line in f:
 
-        if index > 100000:
+        if index > 50000:
             break
 
         split_line = line.split(' ')
@@ -47,14 +49,9 @@ def create_embedding(glove_path, save_embedding=True):
         words_to_index[word] = index  # 3 special tokens before
         index += 1
 
-    words_to_index["<EOS>"] = len(words)
-    global end
-    end = len(words)
-    words.append("<EOS>")
-
     if save_embedding:
         # add special tokens
-        zeros = np.random.rand(3, 50)
+        zeros = np.random.rand(3, 100)
         # zeros = np.zeros((4, 50))
         # zeros[0] = np.random.rand(1, 50)
         # zeros[1, 51] = 1
@@ -62,6 +59,9 @@ def create_embedding(glove_path, save_embedding=True):
         # zeros[3] = np.ones((1, 50))
 
         embeddings = np.array(embeddings)
-        embeddings = np.vstack((zeros, embeddings, np.random.rand(1, 50)))
+        embeddings = np.vstack((zeros, embeddings))
+
+        assert embeddings.shape[0] == len(words_to_index)
+        assert embeddings.shape[1] == 100
 
     print("Word vector loaded")

@@ -20,7 +20,7 @@ if os.path.isfile("./model/checkpoint") and \
 WordEmbedding.create_embedding(".\\Data\\glove.twitter.27B.100d.txt", save_embedding=new)
 
 start_index = 0
-end_index = start_index + 81960
+end_index = start_index + 10240
 
 question_index, response_index, question_length, response_length = \
     ParseData.data_to_index(question[start_index:end_index], response[start_index:end_index], WordEmbedding.words_to_index)

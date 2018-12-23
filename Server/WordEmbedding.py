@@ -36,7 +36,7 @@ def create_embedding(glove_path, save_embedding=True):
     index = 3
     for line in f:
 
-        if index > 50000:
+        if index > 40000:
             break
 
         split_line = line.split(' ')

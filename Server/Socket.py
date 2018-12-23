@@ -7,7 +7,7 @@ from itertools import groupby
 
 
 # initialize network with pre-trained model
-WordEmbedding.create_embedding(".\\Data\\glove.6B.50d.txt", save_embedding=False)
+WordEmbedding.create_embedding(".\\Data\\glove.twitter.27B.100d.txt", save_embedding=False)
 network = ChatbotNetwork(restore=True)
 
 print("Network loaded")
@@ -45,8 +45,8 @@ while True:
                     data = data[1]
                 else:
                     start_token = "<GO>"  # default start token of <GO>
-                input_x, x_length = ParseData.data_to_index(ParseData.split_data([data]),
-                                                            WordEmbedding.words_to_index)
+                input_x, x_length, _ = ParseData.sentence_to_index(ParseData.split_sentence(data),
+                                                                   WordEmbedding.words_to_index)
                 result = start_token + ' ' + network.predict(input_x, x_length, start_token=start_token)
                 # remove consecutive duplicates
                 # https://stackoverflow.com/questions/5738901/removing-elements-that-have-consecutive-duplicates-in-python

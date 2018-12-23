@@ -40,18 +40,16 @@ pip install numpy
 ```
 
 ## Training
-It is recommended to use the pre-trained network provided in the backend folder.
-Training a new network from scratch will require a lot of memory and computing power. **Around 5GB VRAM and 2-3GB RAM**
-(The network is optimized for Tensorflow-GPU and runs on both GPU and CPU. To change this, modify `network.py`)
+Training a chatbot network will take a roughly a few hours. In order to train, you must provide a word embedding (the scripts by default use `glove.twitter.27B.100d.txt`) and the Cornell movie dialog corpus txts in the `./Data` folder.
 
 To train the network, run `Train.py` and input the number of epochs to train for.
-Input `save` to save the network for the socket server and `exit` to exit (_without_ saving).
-For example, the following inputs will save the network after 50 epochs and another 100 epochs
+Input `save` to save the network for the socket server and `exit` to exit (_without_ saving). Input `predict` for inference.  
 
 ```
-Train epochs: 50
-Train epochs: save
-Train epochs: 100
+Train epochs: 10  # train 10 epochs
+Train epochs: predict hey! how are you  # inference with input sequence 'hey! how are you'
+Train epochs: save  # saves the network at ./model
+Train epochs: 15
 Train epochs: save
 Train epochs: exit
 ```

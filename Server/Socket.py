@@ -36,21 +36,15 @@ while True:
                 break
             else:
                 # predict the result
-
-                if "; " in data:
-                    data = data.split("; ")
-                    start_token = data[0].lower()
-                    if start_token not in WordEmbedding.words_to_index:
-                        start_token = "<UNK>"
-                    data = data[1]
-                else:
-                    start_token = "<GO>"  # default start token of <GO>
                 input_x, x_length, _ = ParseData.sentence_to_index(ParseData.split_sentence(data),
                                                                    WordEmbedding.words_to_index)
-                result = start_token + ' ' + network.predict(input_x, x_length, start_token=start_token)
+                result = network.predict(input_x, x_length, start_token='<GO>')
                 # remove consecutive duplicates
                 # https://stackoverflow.com/questions/5738901/removing-elements-that-have-consecutive-duplicates-in-python
-                result = [x[0] for x in groupby(result.split(' '))]
+                result = [x[0] for x in groupby(result.split(' '))][:-2]
+
+                print(result)
+
                 tmp = ""
                 for word in result:
                     tmp += word + " "
@@ -58,4 +52,8 @@ while True:
 
         except socket.timeout:
             print('Connection timed out')
-            break
+            continue
+
+        except socket.error:
+            print('Connection error')
+            continue

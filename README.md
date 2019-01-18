@@ -1,13 +1,13 @@
-# AI-Chatbot
-A demo deep learning chatbot using Tensorflow with a C# WPF GUI.
+# DL-Chatbot
+A demo deep learning RNN chatbot using Tensorflow with a C# WPF GUI.
 
-Note: Pretrained models **are** not provided. Please train your own network.
+Note: Pretrained models are **not** provided. Please train your own network.
 
 ## Usage
 ### Socket
 To use the python backend, run socket.py and connect to the socket on `localhost:8089`.
-Then, send the user input with `input: ` at the beginning. For example, `input: Hello World!`.
-The socket should return just the result (no parsing needed).
+Then, send the user input. For example, `Hello World!`.
+The socket should return the result as a simple string (no parsing needed).
 
 ### GUI 
 First, start the python socket server with the directions above. Then, start the GUI and connect
@@ -55,4 +55,4 @@ Train epochs: exit
 ```
 
 ## License
-[Apache License 2.0](https://github.com/gundamMC/AI-Chatbot/blob/master/LICENSE)
+[Apache License 2.0](https://github.com/gundamMC/DL-Chatbot/blob/master/LICENSE)
